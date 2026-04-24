@@ -1,0 +1,287 @@
+---
+title: "Impact of dose on norovirus antibody kinetics following infection or vaccination"
+author: " "
+format: 
+  docx:
+    code-line-numbers: true
+bibliography: ../products/john-norovirus-antibody-kinetics.bib
+csl: ../products/cid.csl
+nocite: "@*"
+execute: 
+  echo: false
+  message: false
+  warning: false
+lang: en-US
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=FALSE, message=FALSE}
+# load a few R packages
+library(here)
+library(knitr)
+
+# for table fits
+suppressPackageStartupMessages({
+	library(flextable)
+})
+
+fit_flextable_to_page <- function(tbl, page_width = 6.5){
+	
+	ft_out <- tbl |> flextable::autofit()
+	
+	ft_width <- (dim(ft_out)$widths * page_width) /
+		(flextable::flextable_dim(ft_out)$widths)
+	
+	ft_out <- flextable::width(ft_out, width = ft_width)
+	
+	return(ft_out)
+}
+```
+
+# Authors
+
+* Murphy John$^{1,2,\land}$ (ORCID: 0009-0009-9591-1117), 
+* Yang Ge$^{1}$ (0000-0001-5100-0703), 
+* W. Zane Billings$^{1}$ (0000‑0002‑0184‑6134), 
+* Savannah L. Miller$^{1,2}$ (0000-0003-2231-3510), 
+* Cora Hirst$^{3}$ (0009-0005-3078-8729), 
+* Rustom Antia$^{3}$ (0000-0001-7991-614X), 
+* Katia Koelle$^{3}$ (0000-0002-0254-6141), 
+* Ye Shen$^{1, 2}$ (0000-0002-6662-0048), 
+* Benjamin A. Lopman$^{4}$ (0000-0002-9238-0068), 
+* Robert L. Atmar$^{5,6}$ (0000-0001-9989-6772), 
+* Andreas Handel$^{1, 2, \land}$ (0000-0002-4622-1146)
+
+# Author affiliations
+
+1. Department of Epidemiology and Biostatistics, University of Georgia, Athens, GA, USA.
+2. Center for the Ecology of Infectious Diseases, University of Georgia, Athens, GA, USA.
+3. Department of Biology, Emory University, Atlanta, GA, USA.
+4. Department of Epidemiology, Rollins School of Public Health, Emory University, Atlanta, GA, USA.
+5. Department of Molecular Virology and Microbiology, Baylor College of Medicine, Houston, TX, USA.
+6. Department of Medicine, Baylor College of Medicine, Houston, TX, USA.
+
+$\land$ Co-corresponding authors 
+
+Emails: MJ (murphy.john@uga.edu), AH (ahandel@uga.edu)
+
+\pagebreak
+
+# Abstract
+
+Noroviruses are a leading cause of acute gastroenteritis worldwide, yet no licensed vaccines currently exist. Antibody-mediated immunity provides protection, but the relationship between norovirus exposure amount and antibody kinetics is not well understood. We analyzed longitudinal data on HBGA, IgA, and IgG antibodies from two independent human studies: a norovirus infection (NI) trial and a candidate vaccine (NV) trial. We developed hierarchical nonlinear Bayesian models to characterize antibody kinetics following exposure to varying doses across infection and vaccination. We fit models with exponential and power-law decay terms and compared their performance. The power-law models captured antibody waning better than exponential models, consistent with non-constant decay over time that may arise from heterogeneous B-cell responses. Across both studies and antibody types, we found that dose influenced early antibody kinetics, including growth rate, peak response, and decay rate, but the impact was not consistent. Doses that produced larger initial antibody boosts also decayed faster, which led to little correlation between dose and one-year antibody persistence. This suggests a trade-off in dose-induced early immune boost and subsequent waning.
+
+# Author summary
+
+Noroviruses are a major cause of gastroenteritis worldwide, yet no licensed vaccines are currently available. Protection is often mediated by antibodies, but it is not fully understood how the amount of antigen exposure shapes strength or durability of antibody immune response. We analyzed antibody data from two human studies, one infection trial and one candidate vaccine trial, and developed mathematical models to characterize longitudinal antibody kinetics at different exposure doses. We found that antibodies decayed at a non-constant rate over time. Exposure dose influenced early antibody responses, but its effects were inconsistent. Doses that produced stronger early responses also tended to wane faster, and thus dose did not reliably predict how well antibodies persisted. This suggests a dose-dependent trade-off between the strength of the initial response and how quickly it decays.
+
+\pagebreak
+
+# Introduction
+
+Noroviruses are the leading cause of gastroenteritis and foodborne illness in the United States, contributing to significant morbidity in people of all ages [@cdc2024a]. Globally, norovirus causes millions of annual infections and contributes to widespread illness, hospitalization, and mortality [@patel2008; @lozano2012; @bartsch2016; @scallan2011a]. Despite high transmissibility [@atmar2014; @atmar2008] and significant global impact [@scallan2011a; @atmar2011; @johnston2007; @isakbaeva2005; @carling2009; @wikswo2011a; @bitler2013; @bartsch2016], no licensed vaccines or antiviral therapies are available.
+
+Norovirus vaccines are currently under development [@lucero_norovirus_2018; @tan_norovirus_2021]. As these vaccines advance, antibodies are expected to be an important correlate of protection [@reeck2010; @ramani_correlates_2016]. Thus, understanding antigen-specific antibody kinetics is important for informing vaccine design, dosing strategies, and immunization schedules.
+
+The goal of any future norovirus vaccine is to induce strong and durable protection. This is expected to be challenging, as infection-induced protective immunity was estimated to range from only 6 months to 2 years in early human challenge studies [@johnson1990; @parrino1977], and 4 to 8 years in recent population-level modeling [@simmons_duration_2013].
+
+The duration of antibody-mediated protective immunity depends on both the magnitude of antibody responses following antigen exposure and the subsequent rate of waning. Identifying relationships between early antibody kinetic features, such as growth rate and peak, and lasting antibody responses could enable reliable inference of immune persistence from fewer post-exposure samples, reducing costs and logistical challenges relative to prolonged longitudinal sampling.
+
+A key feature of any therapeutic is the dose. For norovirus, viral dose is known to be associated with infection risk [@teunis_norwalk_2008] and has also been linked to more rapid viral shedding and symptom onset [@ge2023a]. However, the impact of virus or antigen dose on antibody induction, decay, and lasting durability remains underexplored.
+
+The goals of this study were to analyze the impact of dose on antibody kinetics following norovirus infection and vaccination, identify early kinetic predictors of lasting antibody durability across doses, and assess the impact of route of exposure (infection versus vaccination) on antibody responses. To address these questions, we conducted secondary analyses of two independent studies: a human norovirus challenge trial and a candidate bivalent virus-like particle (VLP) vaccine trial. We modeled longitudinal antibody kinetics to compare the dose dependence of responses following infection and vaccination and to evaluate whether early antibody kinetics predict lasting persistence.
+
+# Results
+
+We analyzed longitudinal antibody responses from two controlled human studies of norovirus infection and vaccination (@fig-study-designs; see Material and Methods and [@atmar2014; @treanor2014; @reeck2010] for further details). Briefly, the norovirus infection (NI) study experimentally challenged healthy adults with Norwalk virus (GI.1) at three viral dose levels (4.8, 48, and 4800 RT-PCR units). We included only individuals who became infected following challenge. In the norovirus vaccination (NV) study, investigators evaluated a bivalent (GI.1 and GII.4) virus-like particle (VLP) vaccine in healthy adults who received one of four antigen doses (5, 15, 50, and 150 mcg) of each component. In both studies, investigators collected serum samples to quantify norovirus-specific histo-blood group antigen (HBGA)-blocking antibodies, IgA, and IgG at multiple time points spanning the early response to long-term follow-up.
+
+```{r, out.width='95%'}
+#| label: fig-study-designs
+#| fig-cap: |
+#|  [Norovirus infection (NI) and vaccination (NV) study designs. Panel A shows the NI study. Participants were randomized to be challenged with 4.8, 48, or 4800 RT-PCR units of Norwalk virus. Serum samples were collected on days 0, 2, 7, 14, 28, and 180, and antibody responses to GI.1 HBGA-blocking, IgA, and IgG were measured. GI.1 IgA and IgG were assessed at all timepoints, whereas HBGA-blocking antibody measurements were only available on days 0, 14, 28, and 180. Panel B shows the NV study. Participants were randomized to receive a bivalent (GI.1 and GII.4) VLP vaccine at doses of 5, 15, 50, or 150mcg of each component. A second dose was administered 28 days after the first. Serum samples were collected on days 0, 7, 21, 28, 35, 56, 180, and 393. Antibody responses were measured for GI.1 HBGA-blocking, IgA, and IgG, as well as GII.4 IgA and IgG. Figure created in BioRender. Handel, A. (2026) https://BioRender.com/p3sb4gj.]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("assets", "study-designs.png")
+)
+```
+
+## Modeled antibody trajectories following infection or vaccination
+
+We characterized antibody kinetics using two models. One model assumes exponential decay, representing a constant rate of antibody loss, while the other assumes power-law decay, allowing for decreased waning over time that may reflect differences in plasma cell lifespans (see Materials and Methods for model equations and further details). We fit models separately by study and antibody type, incorporating dose effects and individual-level variability. @fig-ni-outcome and @fig-nv-outcome show the population-level predicted trajectories from both models, stratified by antibody type and dose, for the infection and vaccination studies, respectively. We present individual-level fits in the Supplementary Materials (SM) S3.2.
+
+```{r}
+#| label: fig-ni-outcome
+#| fig-cap: |
+#|   [Data and fitted antibody kinetics in the Norovirus Infection (NI) study, by dose group and antibody type among those infected. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation (MAD) are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection. For a summary of the censored observations at each time point, see SM S2.3.1. ]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-ni-model-trajectories.png")
+)
+```
+
+```{r}
+#| label: fig-nv-outcome
+#| fig-cap: |
+#|   [Data and fitted antibody kinetics in the Norovirus Vaccination (NV) study, by dose group and antibody type. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation (MAD) are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection. For a summary of the censored observations at each time point, see SM S2.3.1.]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-nv-model-trajectories.png")
+)
+```
+
+We compared the predictive performance of the exponential and power-law decay models. We found that the power-law model outperformed the exponential model in all cases expect the NI GI.1 HBGA-blocking scenario (@tbl-table1). Given this trend, we base all subsequent main-text analyses on the power-law models and provide corresponding exponential model results in SM S3.5.
+
+```{r}
+#| label: tbl-table1
+#| tbl-cap: "Comparison of exponential and power-law decay models for each study and antibody. Differences in total expected log predictive density (ΔELPD), their standard errors (ΔSE), and the probability that the power-law model has better predictive performance than the exponential model (P(ΔELPD>0)) are shown. Positive ΔELPD values and P(ΔELPD>0) values near 1 and indicate superior performance of the power-law model."
+
+readRDS(here::here("results/tables/model-metrics/tab-model-metrics.rds")) |>
+  fontsize(size = 8, part = "all") |>
+  fit_flextable_to_page()
+```
+
+## Dose-dependent antibody kinetics following infection
+
+Using model-predicted antibody trajectories, we estimated growth rate, peak response (fold change), time of peak, decay rate at day 90, and predicted response (fold change) at one year. Antibody induction and persistence varied by infection dose across antibody types (@fig-ni-measures). Posterior probabilities quantifying dose-dependent differences are provided in SM S3.3.
+
+The highest dose induced slow GI.1 HBGA-blocking antibody growth rates and late peak times, though wide credible intervals indicate substantial uncertainty. Peak responses were similar across dose groups. The 4.8 dose decayed fastest, with posterior probabilities Pr(4.8 > 48) = 0.98 and Pr(4.8 > 4800) = 0.99 that its decay rate exceeded those of the 48 and 4800 doses, respectively. Despite these early kinetic differences, predicted one-year responses were similar across doses.
+
+GI.1 IgA measures varied little across doses. The 4800 dose yielded the highest estimated peak response, though credible intervals overlapped across doses. The 4800 dose also waned more slowly than the other doses, and had a modestly higher one-year response than the 48 dose (Pr(4800 > 48) = 0.8). GI.1 IgG growth rate, peak response, and time of peak were similar across doses. Waning rates modestly decreased with increasing dose (Pr(4.8 > 4800) = 0.94), though predicted one-year responses remained similar.
+
+Across antibody types, IgA showed the strongest peak responses but also the fastest waning. Predicted one-year responses were highest for HBGA-blocking antibody.
+
+```{r}
+#| label: fig-ni-measures
+#| fig-cap: |
+#|   [Power-law model-derived antibody kinetic measures following norovirus infection by challenge dose. Growth rate (per day), peak response (fold change), time of peak (days), decay rate (per day; evaluated at day 90), and predicted response at one year (fold change) are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% MAD-based credible intervals (CIs). For visualization purposes, the y-axis scales for growth rate and time to peak were truncated. The upper bounds of the 95% CIs for the GI.1 HBGA-blocking antibody growth rate at doses 4.8, 48, and 4800 were 2.49, 2.00, and 1.46, respectively.]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-ni-measures.png")
+)
+```
+
+## Dose-dependent antibody kinetics following vaccination
+
+@fig-nv-measures presents model-based kinetic measures across vaccination doses and posterior probabilities quantifying pairwise dose differences are shown in SM S3.3.
+
+GI.1 HBGA-blocking antibody growth rates and peak responses were similar across doses. The 150 dose waned more slowly than all others (Pr(150 < 5), Pr(150 < 15), and Pr(150 < 50) $\ge$ 0.99), producing modestly higher predicted one-year responses.
+
+GI.1 IgA growth rates increased with dose. The 50 and 150 doses generated stronger peak responses and faster decay than the lower doses (Pr $\ge$ 0.95 for all peak and decay comparisons of higher vs. lower dose). Despite faster waning, the larger initial peaks at higher doses translated into slightly higher predicted one-year responses (Pr(50 > 5) = 0.85). GI.1 IgG responses followed a similar pattern, with higher doses producing stronger peaks and faster decay (Pr $\ge$ 0.99 for all higher vs. lower dose comparisons). Predicted one-year responses were broadly similar across doses, with a slight reduction at the 50 dose relative to other doses.
+
+For GII.4 antibodies, peak responses followed a non-monotone pattern, increasing up to the 50 dose and declining at the 150 dose for both IgA and IgG (Pr(50 > 150) = 0.99 and 0.95, respectively). The 150 dose also decayed more slowly than the other doses (Pr(150 < others) $\ge$ 0.88). Overall, the 50 dose produced the strongest predicted one-year response.
+
+Across antibodies, GI.1 HBGA-blocking antibody decayed most slowly and sustained the highest one-year responses. GI.1 antibodies generally produced higher peak and one-year responses than GII.4 antibodies.
+
+```{r}
+#| label: fig-nv-measures
+#| fig-cap: |
+#|   [Power-law model-derived antibody kinetic measures following norovirus vaccination by assigned dose. Growth rate (per day), peak response, time of peak (days), decay rate (per day; evaluated at day 90), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% MAD-based credible intervals (CIs). For visualization purposes, the y-axis scale for growth rate was truncated. The upper bound of the 95% CIs for GI.1 IgA antibody growth rate at the 50 and 150 doses were 4.80 and 4.98, respectively. For GII.4 IgA, they were 5.42 (50) and 4.39 (150).]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-nv-measures.png")
+)
+```
+
+## Predictors of antibody persistence
+
+To evaluate whether early kinetics predict durability, we examined associations between growth rate, peak response, decay rate, and predicted one-year response (@fig-measures-vs). We focused on GI.1 because it was measured in both studies. GII.4 results from the NV study are available in SM S3.4.
+
+Vaccination generally induced faster growth rates than infection across antibody types (@fig-measures-vs A). Within dose groups, growth rate was consistently but moderately associated with one-year response, with 15 of 23 dose-level Spearman correlations $\ge$ 0.40 (@fig-measures-vs A and SM 3.4). This association did not hold across all posterior draws.
+
+IgA and IgG peak responses were more variable following vaccination than infection, whereas HBGA peaks were similar across modalities (@fig-measures-vs B). Within each dose group, peak response was strongly positively associated with predicted one-year response, with 23 of 29 Spearman correlations exceeding 0.8, and posterior draws formed distinct dose-specific bands (@fig-measures-vs B and SM 3.4). The HBGA-blocking and IgA antibodies held this association across all draws ($\rho$ = 0.67 and 0.80, respectively), but IgG did not ($\rho$ = 0.20).
+
+Decay rates were more variable for IgA and IgG following vaccination than infection, while vaccine-induced HBGA-blocking antibodies decayed faster than those following infection (@fig-measures-vs C). Across antibodies, IgA decay rates were generally also faster than those of HBGA-blocking antibody and IgG. Decay rate was negatively associated with one-year response within dose groups, though correlations were of smaller magnitude than those for peak response (@fig-measures-vs C and SM 3.4). This within-dose association held across all draws for HBGA and IgG ($\rho$ = -0.50 and -0.42, respectively), but not for IgA ($\rho$ = -0.02).
+
+```{r}
+#| label: fig-measures-vs
+#| fig-cap: |
+#|   [Power-law model-predicted antibody kinetic measures by study, dose, and antibody. Growth rate (per day), peak response, and decay rate (per day; evaluated at day 90) are plotted against predicted response at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after removing the upper and lower 5% of draws for each measure. Color and shape indicate study and dose, with triangle variations for the NI study and square variations for the NV study. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are provided in the SM S3.4.]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-measures-vs.png")
+)
+```
+
+Within dose groups, growth rate, peak response, and decay rate were all independently associated with predicted one-year response. Growth rate and peak response were themselves strongly correlated (see SM 3.4), and peak response showed stronger associations with one-year response. Prior studies of other antigens have reported a positive coupling between peak and subsequent waning, such that stronger early responses decay more rapidly [@choi_six-month_2023-1; @gutierrez-bautista_study_2022]. Consistent with this, we observed a positive association between peak response and decay rate across posterior draws across all dose groups (@fig-peak-decay-1year A; $\rho$ = 0.22 for GI.1 HBGA, 0.40 for GI.1 IgA, and 0.74 for GI.1 IgG). However, this relationship was not present within dose groups, suggesting that peak response and decay rate contributed independently to one-year response. This indicates that the observed association is driven by dose-dependent variation in antibody induction and decline.
+
+To evaluate how these dynamics jointly shape lasting immunity, we examined predicted one-year responses as a function of both peak response and decay rate (@fig-peak-decay-1year B). Within and across dose groups, one-year response increased with higher peak (holding decay constant) and decreased with faster decay (holding peak constant). Within dose groups, because peak and decay were uncorrelated, posterior draws varied across a range of combinations. Some achieved high peaks with slow decay, others showed modest peaks with rapid waning, and one-year responses reflected the independent, additive contribution of both features. Across dose groups, peak and decay were positively associated, such that their opposing effects on one-year response partially counteracted one another. Together, these results indicate that antibody persistence reflects the joint, and often compensatory, effects of peak response and subsequent decay. Moreover, the relationship between peak response and decay differed fundamentally within versus across dose groups.
+
+```{r}
+#| label: fig-peak-decay-1year
+#| fig-cap: |
+#|   [Joint relationships of peak response, decay rate (per day; evaluated at day 90), and predicted response at one year. Panel A shows peak response versus decay rate, with study- and dose-specific points indicated by shape and color. Triangle variations are used for the NI study and square variations for the NV study. Panel B shows the same relationship but with color representing predicted antibody response at one year. Antibody-specific color scales are shown underneath their corresponding plot. Larger points denote posterior medians. Smaller points represent a random subset of 500 posterior draws per dose, sampled after removing the upper and lower 5% of draws. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are provided in the SM S3.4.]{color="#FF2400"}
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/manuscript/plot-peak-decay-vs-comb.png")
+)
+```
+
+## Additional Analyses
+
+We presented results from the power-law model in the main text because it fit the data better than the exponential decay model. We provide corresponding results from the exponential model in the SM S3.5. Most findings were consistent across models. In the NI study, GI.1 HBGA-blocking antibody peak response remained strongest at the lowest dose; however, differences between doses were smaller under the exponential model. Consequently, the 4800 dose exhibited a one-year response approximately 2-fold higher than the 4.8 dose. We note that for this scenario, model comparison slightly favored the exponential model. Its peak and one-year response estimates may therefore be more reliable for this particular antibody and dose combination. All other analyses remained unchanged, and the joint relationship between peak response, decay rate, and one-year response persisted.
+
+We conducted several sensitivity analyses to evaluate methodological choices. First, we assessed the lower bound used in the censoring procedure. Results were robust to the choice of censoring bound ($10^{-6}$ in the main text; $10^{-2}$ and $10^{-14}$ evaluated in SM S3.6). Second, because decay in the power-law model is not constant over time, we evaluated decay at day 90 in the main analysis and at days 60, 180, and 365 in the SM S3.7. As expected, magnitudes differed, but qualitative trends were unchanged.
+
+Finally, we evaluated the role of baseline antibody levels. In the main analysis, peak response and one-year response were defined relative to baseline, while absolute titers are reported in SM S3.8. Absolute titers reflect potential protection, whereas response measures capture exposure-induced change. Across both studies, baseline differences between dose groups modestly influenced both peak and one-year responses. For example, in the NI study, the 4800 dose group had the lowest baseline titers. This group also had the largest IgA peak and one-year responses but the lowest absolute peak and one-year titers. In the NV study, the 50 dose group had the lowest baseline GI.1 IgA, GII.4 IgA, and GII.4 IgG titers, which may have contributed to the smallest absolute one-year titers despite the strongest peak and one-year responses. We found that these differences did not alter the overall patterns linking growth, peak response, and decay rate to predicted one-year titers. Peak response and decay rate remained positively associated, and one-year titers reflected the combined effects of peak magnitude and waning. Although absolute and baseline-relative measures differ in interpretation, our primary conclusions regarding the joint role of response magnitude and decay dynamics remain unchanged.
+
+# Discussion
+
+We compared antibody kinetics following norovirus infection and vaccination to assess how dose shapes the response magnitude and durability of multiple antibodies. Across both exposure modalities, antibody waning was better described by a power-law than an exponential model, supporting non-constant decay over time. A power-law decay implies a progressive slowing of antibody loss, consistent with heterogeneity in plasma cell longevity. Early antibody responses may be dominated by short-lived plasma cells that decay rapidly, whereas longer-lived populations persist and shape later titers [@amanna_duration_2007]. Such heterogeneity may arise from multiple plasma cell subpopulations [@teunis_linking_2016; @chernova_lasting_2014; @robinson_intrinsically_2023], competition for limited bone marrow survival niches [@radbruch_competence_2006], and progressive differentiation into longer-lived plasma cells [@zarnitsyna_dynamics_2021; @akondy_origin_2017; @koike_progressive_2022; @simons_tuning_2024; @stromberg_population-expression_2013]. Differences in plasma cell origin may further contribute, with germinal center-derived responses supporting greater durability than extrafollicular responses [@amitai_population_2017; @elsner_germinal_2020; @meyer-hermann_molecular_2021; @victora_germinal_2022]. In this context, the superior performance of the power-law relative to the exponential model aligns with prior evidence that humoral immunity does not wane at a constant rate [@saha_quantifying_2025].
+
+We found that dose can influence early antibody kinetics. Although credible intervals for many estimates overlapped across doses, several qualitative patterns emerged. Following infection, GI.1 HBGA-blocking antibody peak responses were similar across all doses, suggesting that low-dose infection may engage high-affinity B cells or promote germinal center entry [@molari_quantitative_2020] as effectively as high-dose exposure. Despite differences in early kinetics, predicted responses at one year mostly converged across doses, suggesting that persistence is governed by downstream regulatory constraints that are relatively insensitive to antigen load. 
+
+Vaccination showed similarly complex dose-kinetic relationships. Increasing vaccine dose did not uniformly increase response or growth rate, and effects varied by antibody type and viral strain. Doses that produced the highest peak responses also exhibited faster decay, consistent with a trade-off between early expansion and subsequent contraction of antibody-secreting populations [@amanna_mechanisms_2010; @andraud_living_2012; @choi_six-month_2023], which limits the extent to which dose-dependent differences in early kinetics translate into durable antibody levels. In addition, interactions between vaccine components may have contributed to these patterns, with higher GI.1 antigen content attenuating GII.4 responses, consistent with antigenic interference in multivalent formulations [@treanor2014; @leroux-roels_safety_2018; @xie_immune_2023; @kallas_antigenic_2019].
+
+Vaccination and infection elicited qualitatively different early antibody dynamics despite broadly similar durability. Antibody responses following vaccination exhibited faster growth rates, consistent with more synchronous antigen exposure and uniform innate activation compared with natural infection [@epsi_understanding_2023; @teijaro_covid-19_2021]. GI.1 IgA and IgG peak responses showed greater dose-dependent heterogeneity following vaccination than infection, indicating that controlled vaccine dosing allows greater modulation of early kinetics, whereas infection imposes tighter constraints on response magnitude [@valiante_innate_2003; @shen_innate_2022]. Despite these differences in early dynamics, predicted responses at one year were largely comparable between infection and vaccination for both IgA and IgG, reinforcing the idea that antibody persistence is constrained by shared downstream mechanisms, such as limits on long-lived plasma cell survival. The duration of vaccine-induced immunity and how it compares with natural infection remains unknown, but these results provide preliminary evidence that both exposures may converge to similar IgA and IgG antibody levels over time. GI.1 HBGA-blocking antibody responses at one year were slightly higher after infection than after vaccination, suggesting that in the context of these study doses and methods, natural infection may more broadly engage immune pathways than vaccination, a finding that warrants further investigation.
+
+Our investigation of whether early kinetic features could serve as reliable predictors of antibody persistence suggests a nuanced picture. Within dose groups, growth rate and peak response were positively associated with one-year response while decay rate was negatively associated. Across dose groups, we observed a positive association between peak response and decay rate, such that higher peaks tended to be accompanied by faster decay, partially offsetting their effects on persistence. However, this relationship was not observed within dose groups.
+
+This study has several limitations. Infection and vaccination cohorts differed in route of exposure, dose, and strain composition, limiting direct quantitative comparison. Sample sizes within dose groups were small, sampling was infrequent, and follow-up extended to, at most, approximately one year, necessitating model-based extrapolation for longer-term persistence. Serum antibody responses represent only one dimension of immunity and do not capture mucosal responses or cellular immunity.
+
+In conclusion, while our findings need to be validated in larger studies, they preliminarily suggest that the impact of dose can vary by antibody type and modality of delivery, and that despite differences in the early antibody kinetics, persistence seems to be minimally influenced by dose. These results suggest that effective norovirus vaccine design should focus not only on maximizing early antibody induction but also on promoting the formation and survival of long-lived plasma cells and functional immune memory.
+
+# Materials and Methods
+
+## Data
+
+We analyzed data from two previously conducted studies.
+
+The Norovirus Infection (NI) study randomized healthy adults in a double-blind, placebo-controlled human challenge trial (ClinicalTrials.gov, NCT00138476) [@atmar2014]. Participants received either placebo or Norwalk virus (GI.1) inoculum. For this analysis, we included participants who became infected after challenge with 4.8 (n=6), 48 (n=7), or 4800 (n=6) RT-PCR units. Infection was pre-defined as meeting at least one of the following criteria: (i) detection of fecal virus by enzyme immunoassay (EIA) or RT-PCR, or (ii) $\ge4$-fold rise in serum antibody titers from baseline to day 28.
+
+The Norovirus Vaccination (NV) study was a randomized, double-blind, placebo-controlled phase 1 trial (LV03-104) evaluating a bivalent (GI.1 and GII.4) virus-like particle (VLP) vaccine (ClinicalTrials.gov, NCT01168401) [@treanor2014]. Healthy adults received either placebo or one of four vaccine doses: 5 mcg (n=10), 15 mcg (n=10), 50 mcg (n=10), 150 mcg (n=9) of each component. Two intramuscular injections were administered 28 days apart.
+
+In both studies, blood samples were collected at multiple time points to measure norovirus-specific HBGA-blocking, IgA, and IgG antibodies, as previously described [@atmar2014; @treanor2014; @reeck2010]. In the NI study, samples were collected at approximately days 0, 2, 7, 14, 28, and 180. IgA and IgG were measured at all time points, and HBGA assays were available for days 0, 14, 28, 180. The NV study collected samples on days 0, 7, 21, 28, 35, 56, 180, and 393, with antibody levels measured in duplicate for day 0 and day 56 samples. Antibodies included GI.1 HBGA, GI.1 IgA, GI.1 IgG, GII.4 IgA, and GII.4 IgG. We summarize participant demographics in the SM S3.1.
+
+## Antibody kinetic models
+
+We described antibody kinetics using two heuristic models that differ in their decay terms. One model implements exponential decay, and the other implements power-law decay [@teunis2016a; @degraaf2014a; @cohen2021a]. Each model contained a flexible function to represent the initial rise in antibody titers. The exponential model assumes a constant decay rate, whereas the power-law model allows the decay rate to decrease over time, potentially capturing long-term immune memory dynamics more accurately [@saha_quantifying_2025]. 
+
+The exponential decay model is given by
+
+$$y_1(t) = \frac{P_1}{1+e^{(-G_1*(t-K_1))}}e^{-D_1*t}$$
+
+and the power-law decay model is defined as
+
+$$y_2(t) = \frac{P_2}{1+e^{(-G_2*((t+1)-K_2))}}(t+1)^{-D_2}$$
+
+In both models, $y(t)$ denotes the antibody level at time $t$. The parameter $P_i$ controls the peak antibody level, $G_i$ represents the initial growth rate, $K_i$ the time at peak, and $D_i$ the decay rate. The index $i=1,2$ corresponds to the exponential and power-law decay models, respectively. To avoid singularities in the power-law model at $t=0$, we shift the time scale by one unit (replacing $t$ with $t+1$). We provide further details and fully parameterized equations, including individual-level random effects, in the SM S2.
+
+Although the NV study included a two-dose vaccination regimen, individual antibody trajectories exhibited a single peak, typically occurring between the first and second doses, with little evidence of a distinct second peak following the booster (see SM S3.2.1). We therefore applied the same single-peak models to both the NI and NV studies. We converted antibody titer data and models to natural log units for model fitting.
+
+We fit models separately for each study and antibody type, including dose as a fixed effect and subject-specific random intercepts to capture individual-level variation. We identified censored observations based on assay characteristics, prior literature, or apparent clustering in the data. For HBGA, the assay detection range was 25 to 3200. In the NI study, the lower detection limit was 0.8 for IgA and 0.7 for IgG. In the NV study, the lower limits were 3.1 for IgA and 1.6 for IgG. We treated values at or exceeding the upper detection limit as right-censored and values at or below the lower detection limit as interval-censored between $10^{-6}$ and the lower limit. Censoring was incorporated directly into the likelihood using the censored-response functionality in the Bayesian models implemented in brms, allowing right- and interval-censored observations to contribute appropriately to posterior inference. We chose the lower bound of $10^{-6}$ to avoid undefined values on the log scale, as antibody levels cannot be negative. Alternative lower bounds produced qualitatively similar results (see SM S3.6).
+
+We compared exponential and power-law decay models using approximate leave-one-out cross-validation based on the expected log predictive density (ELPD) [@mcelreath2020; @sivula_uncertainty_2025]. We computed the difference in ELPD between the models ($\Delta ELPD$) and estimated the probability that the power-law model had better predictive performance than the exponential model ($P(\Delta ELPD >0)$) under a normal approximation. Because our sample size was small, we conservatively inflated the standard error by a factor of two [@bengio_no_2003; @sivula_uncertainty_2025].
+
+We used posterior draws to reconstruct trajectories and determine relevant kinetic measures, namely growth rate (per day), peak response (the difference between log peak titer and log baseline titer), time of peak (days), antibody waning rate (per day), and predicted response at one year post-infection or post-vaccination (the difference between log predicted titer at one year and log baseline titer). For the power-law model, we summarized waning by evaluating the implied exponential decay rate (the tangent of the decay curve on the log scale) at days 60, 90, 180, and 365 to facilitate comparison with the exponential model. The exponential model includes a single decay parameter that directly represents a constant decay rate on the log scale. Detailed descriptions for the full Bayesian models and additional implementation and modeling details are provided in the SM S2.
+
+We conducted all analyses in R version 4.5.2 (2025-10-31 ucrt) [@r_core_team_r_2025] in RStudio version 2026.01.0+392 [@posit_team_rstudio_2025]. Our analysis pipeline was implemented in targets [@william_michael_landau_targets_2021]. We used the packages here [@kirill_muller_here_2025], renv [@kevin_ushey_renv_2025], and the tidyverse [@wickham_welcome_2019] suite for data processing and project management. We used the packages ggplot2 [@hadley_wickham_ggplot2_2016], patchwork [@thomas_lin_pedersen_patchwork_2025], ggokabeito [@malcolm_barrett_ggokabeito_2021], and ggh4x [@teun_van_den_brand_ggh4x_2025] for generating figures; and the packages gtsummary [@daniel_d_sjoberg_reproducible_2021], and flextable [@david_gohel_flextable_2026] for generating tables. We generated the manuscript using Quarto version 1.8.25 [@jj_allaire_quarto_2026] along with the R package knitr [@yihui_xie_knitr_2014]. We implemented our Bayesian models with the brms package [@burkner_bayesian_2021] using the cmdrstan backend and cmdrstan version 2.38.0 [@jonah_gabry_cmdstanr_2025] as the interface to the Stan programming language for Bayesian modeling. The SM contains extended details on our methodology, including instructions for reproducing our results. Our data and code are archived on GitHub (https://github.com/ahgroup/john-norovirus-antibody-kinetics-public).
+
+# References
