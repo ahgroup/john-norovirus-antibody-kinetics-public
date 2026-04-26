@@ -235,8 +235,7 @@ func_process_measures <- function(measures, use_id=NULL,
         )
         
         scalar_measures <- c("peak","peak_time","growth_rate","peak_response",
-                             "baseline","titer_1year","response_1year",
-                             "response_5year","time_response")
+                             "baseline","titer_1year","response_1year")
         
         for (m in scalar_measures) {
           
@@ -275,8 +274,7 @@ func_process_measures <- function(measures, use_id=NULL,
           )
           
           scalar_measures <- c("peak","peak_time","growth_rate","peak_response",
-                               "baseline","titer_1year","response_1year",
-                               "response_5year","time_response")
+                               "baseline","titer_1year","response_1year")
           
           for (m in scalar_measures) {
             
@@ -402,7 +400,6 @@ func_process_draws <- function(measures, use_id) {
 
 func_pairwise_compare <- function(draws) {
   
-  browser()
   measures <- c("peak", "growth_rate", "peak_response", "peak_time", 
                 "titer_1year", "response_1year", "decay_rate_D90")
   

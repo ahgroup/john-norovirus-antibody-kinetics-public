@@ -4,7 +4,6 @@
 
 func_tab_model_metrics <- function(metrics_ni, metrics_nv, filepath) {
   
-  browser()
   metrics <- bind_rows(metrics_ni, metrics_nv) %>%
     mutate(
       antibody = stringr::str_replace(antibody,"_"," "),
@@ -33,7 +32,7 @@ func_tab_model_metrics <- function(metrics_ni, metrics_nv, filepath) {
 }
 
 func_tab_n_cens <- function(data, filepath) {
-  browser()
+  
   library(gtsummary)
   
   # get clean time points for ni study
@@ -93,8 +92,6 @@ func_tab_n_cens <- function(data, filepath) {
 }
 
 func_tab_correlations <- function(correlations, model, by, baseline, filepath) {
-  
-  browser()
   
   dat_filter <- correlations %>%
     filter(

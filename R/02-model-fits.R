@@ -6,13 +6,15 @@ func_setup_model <- function() {
   
   library(brms)
   
+  total_cores <- parallelly::availableCores(omit = 2)
+  
   # brms settings
   set_brms <- list(
     myseed=333,
     mywarmup=1000,
     myiter=3000,
     mychains=4,
-    mycores=max(1, parallel::detectCores()-1),
+    mycores=max(1, floor(total_cores / 4)),
     my_adapt_delta=0.99,
     my_max_tree=15
   )
@@ -28,7 +30,7 @@ func_setup_model <- function() {
     brms::prior(normal(0, 1.5), class = "b", nlpar = "g"),  # fixed growth rate
     brms::prior(student_t(3, 0, 2), class = "sd", nlpar = "g", lb = 0),  # sd
     
-    brms::prior(normal(log(10), 1), class = "b", nlpar = "k"),  # half-peak time
+    brms::prior(normal(log(10), 1), class = "b", nlpar = "k"),  # time of half peak
     brms::prior(student_t(3, 0, 2), class = "sd", nlpar = "k", lb = 0),  # sd
     
     brms::prior(normal(-4, 1.5), class = "b", nlpar = "d"),  # fixed waning parameter

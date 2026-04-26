@@ -71,7 +71,7 @@ func_plot_group_model_traj <- function(predictions, data, filepath, height, widt
     scale_linetype_discrete(
       labels=c("exp"="Exponential decay", "pow"="Power-Law decay"), 
       guide="legend") +
-    labs(x="Days post-inoculation",
+    labs(x="Days post-exposure",
          y="Titer",
          fill="Model",
          linetype="Model",
@@ -202,8 +202,7 @@ func_plot_measures_vs_1year_draws <- function(setup,
                                               decay_day, main=NULL, 
                                               baseline=FALSE, model_name, 
                                               file_path, height, width) {
-  browser()
-  
+
   library(ggplot2)
   library(patchwork)
   
@@ -240,7 +239,7 @@ func_plot_measures_vs_1year_draws <- function(setup,
       antibody %in% antibodies,
     ) %>%
     tidyr::pivot_longer(
-      cols = c(x_measure,growth_rate,decay_rate_D90),
+      cols = c(x_measure,growth_rate,all_of(decay_name)),
       names_to = "measure_name",
       values_to = "measure"
     ) %>%
@@ -265,7 +264,7 @@ func_plot_measures_vs_1year_draws <- function(setup,
       values_from = est
     ) %>%
     tidyr::pivot_longer(
-      cols = c(x_measure,growth_rate,!!decay_name),
+      cols = c(x_measure,growth_rate,all_of(decay_name)),
       names_to = "measure_name",
       values_to = "measure"
     ) %>%
@@ -732,20 +731,27 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
   
   peak <- dat_schematic %>% filter(y==max(y))
   peak_day <- peak %>% pull(day)
-  half_peak_day <- peak_day * 0.5 # technically growth rate is using 70% peak titer but thats complicated
   baseline <- dat_schematic %>% filter(day == 0)
   response_1year <- dat_schematic %>% filter(day == 365)
-  decay_85 <- dat_schematic %>% filter(day %in% c(85))
-  decay_95 <- dat_schematic %>% filter(day %in% c(95))
-  growth1 <- dat_schematic %>% slice(which.min(abs(day - half_peak_day)))
-  growth2 <- dat_schematic %>% slice(which.min(abs(day - (half_peak_day + 1))))
+  
+  decay_89 <- dat_schematic %>% filter(day %in% c(89))
+  decay_91 <- dat_schematic %>% filter(day %in% c(91))
+  
+  half_peak_logy <- (baseline$logy + peak$logy) / 2
+  growth1 <- dat_schematic %>% 
+    filter(day < peak_day) %>%
+    slice(which.min(abs(logy - half_peak_logy)))
+  growth2 <- dat_schematic %>% 
+    filter(day < peak_day) %>%
+    slice(which.min(abs(day - (growth1$day + 1))))
   
   p <- ggplot() +
     geom_line(data = dat_schematic, aes(x = day, y = exp(logy))) +
     # peak 
     geom_point(data = peak, aes(x = day, y = exp(logy)), color = "black", size = 3) +
     geom_text(data = peak, aes(x = day, y = exp(logy), label = "Peak titer"), vjust = -1, size = 3) +
-    # peak increase
+    
+    # peak response
     geom_text(data = peak, aes(x = day, y = exp(logy), label = "Peak response"), vjust=15, hjust=-0.1, size = 3) +
     geom_segment(
       aes(x = peak$day, xend = peak$day,
@@ -753,6 +759,7 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
       arrow = arrow(ends = "both", length = unit(0.3, "cm"), type = "closed"),
       color = "#56B4E9", size = 0.5
     ) +
+    
     # time of peak
     geom_segment(
       data = peak,
@@ -771,10 +778,10 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
     geom_text(data = baseline, aes(x = day, y = exp(logy), label = "Baseline"), vjust = 1.9, hjust=0.6, size = 3) +
     geom_hline(yintercept = exp(baseline$logy), linetype="dashed") +
     
-    # titer 1-year
+    # 1-year titer
     geom_text(data = response_1year, aes(x = day, y = exp(logy), label = "1-year titer"), vjust=-2, hjust=1.1, size = 3) +
     
-    # response_1year
+    # 1-year response
     geom_point(data = response_1year, aes(x = day, y = exp(logy)), color = "black", size = 3) +
     geom_text(data = response_1year, aes(x = day, y = exp(logy), label = "1-year response"), vjust=4.5, hjust=1.1, size = 3) +
     geom_segment(
@@ -785,15 +792,15 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
     ) +
     
     # decay
-    geom_text(data = decay_85, aes(x = day, y = exp(logy), label = "Decay rate"), vjust=0, hjust=-0.2, size = 3) +
+    geom_text(data = decay_89, aes(x = day, y = exp(logy), label = "Decay rate"), vjust=0, hjust=-0.2, size = 3) +
     geom_segment(
-      aes(x = 85, xend = 95,
-          y = exp(decay_85$logy), yend = exp(decay_95$logy)),
-      color = "#E69F00", size = 1
+      aes(x = 89, xend = 91,
+          y = exp(decay_89$logy), yend = exp(decay_91$logy)),
+      color = "#E69F00", size = 3
     ) +
     
     # growth
-    geom_text(data = growth1, aes(x = day, y = exp(logy), label = "Growth rate"), vjust=-0.5, hjust=0.5, angle = 85, size = 3) +
+    geom_text(data = growth1, aes(x = day, y = exp(logy), label = "Growth rate"), vjust=-0.9, hjust=0, angle = 85, size = 3) +
     geom_segment(
       aes(x = growth1$day, xend = growth2$day,
           y = exp(growth1$logy), yend = exp(growth2$logy)),
@@ -812,7 +819,7 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
 }
 
 func_plot_prior_posterior_draws <- function(draws, file_path, width, height) {
-  browser()
+  
   library(ggplot2)
   
   # process draws 
@@ -1250,7 +1257,7 @@ func_plot_comb_group_peak_decay_1year_draws <- function(p1,p2,p3,
 
 func_plot_pairwise_compare <- function(probabilities, model, 
                                        filepath, height, width) {
-  browser()
+  
   library(ggplot2)
   
   dat_prob <- probabilities %>% 

@@ -9,7 +9,7 @@ func_get_preds <- function(data, models, use_id=NULL) {
   predictions <- list()
   
   # define sequence of time points for predictions
-  pred_seq <- unique(c(seq(0,20,1/6), seq(20,400,1), 1826)) # 5 years
+  pred_seq <- unique(c(seq(0,20,1/6), seq(20,400,1)))
   
   # get antibodies
   antibodies <- unique(data$antibody)
