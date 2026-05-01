@@ -33,7 +33,8 @@ func_figure_setup <- function() {
   )
 }
 
-func_plot_group_model_traj <- function(predictions, data, filepath, height, width) {
+func_plot_group_model_traj <- function(predictions, data, main=NULL,
+                                       filepath, height, width) {
   
   library(ggplot2)
   
@@ -42,6 +43,8 @@ func_plot_group_model_traj <- function(predictions, data, filepath, height, widt
   } else {
     max_day <- max(data$day, na.rm = TRUE)
   }
+  
+  legend_position <- if (!is.null(main)) "none" else "bottom"
   
   p <- ggplot(predictions) +
     geom_line(aes(x=day, y=y,
@@ -63,13 +66,13 @@ func_plot_group_model_traj <- function(predictions, data, filepath, height, widt
     ) +
     facet_grid(dose~antibody_clean, switch="y") +
     ggokabeito::scale_color_okabe_ito(
-      labels=c("exp"="Exponential decay", "pow"="Power-Law decay")
+      labels=c("exp"="Exponential decay", "pow"="Power-law decay")
     ) +
     ggokabeito::scale_fill_okabe_ito(
-      labels=c("exp"="Exponential decay", "pow"="Power-Law decay"), 
+      labels=c("exp"="Exponential decay", "pow"="Power-law decay"), 
       guide="legend") +  
     scale_linetype_discrete(
-      labels=c("exp"="Exponential decay", "pow"="Power-Law decay"), 
+      labels=c("exp"="Exponential decay", "pow"="Power-law decay"), 
       guide="legend") +
     labs(x="Days post-exposure",
          y="Titer",
@@ -77,7 +80,7 @@ func_plot_group_model_traj <- function(predictions, data, filepath, height, widt
          linetype="Model",
          col="Model") +
     theme_bw() +
-    theme(legend.position="top",
+    theme(legend.position=legend_position,
           axis.text = element_text(size=11),
           axis.title = element_text(size=16),
           strip.text = element_text(size=12),
@@ -92,6 +95,30 @@ func_plot_group_model_traj <- function(predictions, data, filepath, height, widt
   )
   
   return(p)
+  
+}
+
+func_plot_comb_group_model_traj <- function(ni_plot, nv_plot, filepath, width, height) {
+  
+  library(ggplot2)
+  library(patchwork)
+  
+  top_row <- ni_plot + guide_area() + 
+    plot_layout(widths = c(2.1, 1), guides = "collect") &
+    theme(legend.position = "right")
+  
+  p <- top_row / nv_plot +
+    plot_layout(
+      heights = c(1, 1.3),
+    ) +
+    plot_annotation(tag_levels = "A")
+  
+  ggsave(
+    filename = filepath,
+    plot = p,
+    width = width,
+    height = height
+  )
   
 }
 

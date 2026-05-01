@@ -469,6 +469,7 @@ list(
     func_plot_group_model_traj(
       predictions=process_ni_group_preds,
       data=process_ni_data,
+      main=TRUE,
       filepath=here::here("results/figures/manuscript/plot-ni-model-trajectories.png"),
       height=5,
       width=7
@@ -480,9 +481,21 @@ list(
     func_plot_group_model_traj(
       predictions=process_nv_group_preds,
       data=process_nv_data,
+      main=TRUE,
       filepath=here::here("results/figures/manuscript/plot-nv-model-trajectories.png"),
       height=7,
       width=10
+    )
+  ),
+  
+  tar_target(
+    plot_comb_group_model,
+    func_plot_comb_group_model_traj(
+      ni_plot=plot_ni_group_model, 
+      nv_plot=plot_nv_group_model, 
+      filepath=here::here("results/figures/manuscript/plot-comb-model-trajectories.png"),
+      width=11, 
+      height=14
     )
   ),
   

@@ -42,16 +42,16 @@ fit_flextable_to_page <- function(tbl, page_width = 6.5){
 
 # Reproducibility instructions
 
-To reproduce our results, first clone or download the GitHub repository (hosted here: https://github.com/ahgroup/john-norovirus-antibody-kinetics-public). Once downloaded, open the `.Rproj` file in RStudio. We used the R package `targets` [@william_michael_landau_targets_2021] to implement the analysis pipeline which can be executed in full by running `targets::tar_make()`. The pipeline automatically detects the number of cores on your device and runs in parallel, leaving two cores free. For reproducibility across devices, model fitting was parallelized adaptively based on available system resources. The total number of available CPU cores was determined while leaving two cores free, and each model was assigned approximately one quarter of the remaining cores (with at least one core per model) for MCMC sampling. This approach ensures that total core usage remains bounded while enabling efficient parallel computation across different computing environments. Note that parallel execution may be resource-intensive on personal computers; if you are in a limited computing environment, you can run sequentially by specifying `use_crew = FALSE`. However, running all Bayesian models sequentially may be very slow. You can visualize the workflow using `targets::tar_visnetwork()` and run only selected targets by passing a vector of target names to `tar_make()`, optionally using tidyselect helpers. Due to OS and file system differences, some targets may appear outdated even when up-to-date; this can be safely ignored. Note that not all model result files are included in the GitHub repository, as they exceed 10GB. To inspect or modify the Bayesian models, you will need to rerun the code.
+To reproduce our results, first clone or download the GitHub repository (hosted here: https://github.com/ahgroup/john-norovirus-antibody-kinetics-public). Once downloaded, open the `.Rproj` file in RStudio. We used the R package `targets` [@zotero-item-38674] to implement the analysis pipeline which can be executed in full by running `targets::tar_make()`. The pipeline automatically detects the number of cores on your device and runs in parallel, leaving two cores free. For reproducibility across devices, model fitting was parallelized adaptively based on available system resources. The total number of available CPU cores was determined while leaving two cores free, and each model was assigned approximately one quarter of the remaining cores (with at least one core per model) for MCMC sampling. This approach ensures that total core usage remains bounded while enabling efficient parallel computation across different computing environments. Note that parallel execution may be resource-intensive on personal computers; if you are in a limited computing environment, you can run sequentially by specifying `use_crew = FALSE`. However, running all Bayesian models sequentially may be very slow. You can visualize the workflow using `targets::tar_visnetwork()` and run only selected targets by passing a vector of target names to `tar_make()`, optionally using tidyselect helpers. Due to OS and file system differences, some targets may appear outdated even when up-to-date; this can be safely ignored. Note that not all model result files are included in the GitHub repository, as they exceed 10GB. To inspect or modify the Bayesian models, you will need to rerun the code.
 
 Once you have cloned our repository, follow these instructions to reproduce our results.
 
 1. Open the `john-norovirus-antibody-kinetics-public.Rproj` file in RStudio.
 2. Once renv initializes, run the command renv::restore() in the console to begin installing the required packages. If you have issues at this stage you can also install the dependencies manually, but if you do not use renv or you use different package versions than we did, our code might not work for you.
-3. If you want to run any steps that involve Bayesian models, you need to install cmdstan following the cmdstanr quick start guide at this location: https://mc-stan.org/cmdstanr/articles/cmdstanr.html. We used cmdstan version 2.38.0 for this project.
+3. If you want to run any steps that involve Bayesian models, you need to install cmdstanr following the cmdstanr quick start guide at this location: https://mc-stan.org/cmdstanr/articles/cmdstanr.html. We used cmdstanr version 2.38.0 for this project [@jonah_gabry_cmdstanr_2025].
 4.	Now you can run our pipeline by running `targets::tar_make()` in the console. If you would like to run only the main text results, run `targets::tar_make("reproduce_manuscript")` in the console. See the `_targets.R` file for further instructions and the full pipeline. If you are new to targets and want to learn more about how the pipeline works, we recommend reading the targets manual which can be found here: https://books.ropensci.org/targets/.
 
-The full pipeline, including supplementary analyses, took us approximately 17 hours to run. Reproducing only the main text analyses took us approximately 6 hours.
+We conducted all analyses in R version 4.5.2 (2025-10-31 ucrt) [@zotero-item-38678] in RStudio version 2026.01.0+392 [@zotero-item-38677]. The full pipeline, including supplementary analyses, took us approximately 17 hours to run. Reproducing only the main text analyses took us approximately 6 hours.
 
 # Extended methods
 
@@ -184,7 +184,7 @@ $$d_{2,dose_i} \sim \text{Normal}(-1,1.5)$$
 
 ## Model implementation and computation
 
-Models were implemented using the `brms` package [@burkner_bayesian_2021], which uses Hamiltonian Monte Carlo (HMC) implemented via Stan [@jonah_gabry_cmdstanr_2025], to draw posterior samples of the model parameters. Each model was fit with 3,000 iterations per chain, including 1,000 warm-up iterations and 2,000 post-warmup samples. With four parallel Markov chains, this resulted in a total of 8,000 posterior samples per model. An adaptive delta of 0.99 was used to reduce divergent transitions, and the maximum tree depth was set to 15, corresponding to a maximum of $2^{15}=32,768$ leapfrog steps per iteration. We used the default values for all other algorithm parameters.
+Models were implemented using the `brms` package [@burkner2021a], which uses Hamiltonian Monte Carlo (HMC) implemented via Stan, to draw posterior samples of the model parameters. Each model was fit with 3,000 iterations per chain, including 1,000 warm-up iterations and 2,000 post-warmup samples. With four parallel Markov chains, this resulted in a total of 8,000 posterior samples per model. An adaptive delta of 0.99 was used to reduce divergent transitions, and the maximum tree depth was set to 15, corresponding to a maximum of $2^{15}=32,768$ leapfrog steps per iteration. We used the default values for all other algorithm parameters.
 
 ### Censoring
 
@@ -505,13 +505,13 @@ knitr::include_graphics(here::here('results/figures/supplement/fitted-observed-p
 
 ## Model comparison
 
-We compared exponential and power-law decay models using approximate leave-one-out cross-validation (LOO-CV) based on the expected log predictive density (ELPD) [@mcelreath2020; @sivula_uncertainty_2025]. Model performance was assessed using the difference in expected log predictive density between models, defined as
+We compared exponential and power-law decay models using approximate leave-one-out cross-validation (LOO-CV) based on the expected log predictive density (ELPD) [@mcelreath2020; @sivula2025]. Model performance was assessed using the difference in expected log predictive density between models, defined as
 
 $$\Delta ELPD = ELPD_{power-law} - ELPD_{exponential}$$
 
 Positive values of $\Delta ELPD$ indicate better predictive performance of the power-law model relative to the exponential model.
 
-We obtained an estimate of the standard error of $\Delta ELPD$ from the approximate LOO-CV procedure. In small sample settings, the uncertainty of $\Delta ELPD$ may be underestimated due to the instability of pointwise predictive contributions [@sivula_uncertainty_2025]. To address this, we applied a conservative adjustment by inflating the standard error by a factor of two, following a heuristic for uncertainty quantification in small samples [@bengio_no_2003]:
+We obtained an estimate of the standard error of $\Delta ELPD$ from the approximate LOO-CV procedure. In small sample settings, the uncertainty of $\Delta ELPD$ may be underestimated due to the instability of pointwise predictive contributions [@sivula2025]. To address this, we applied a conservative adjustment by inflating the standard error by a factor of two, following a heuristic for uncertainty quantification in small samples [@bengio2003]:
 
 $$\tilde{\sigma}_{\Delta} = 2 \cdot SE(\Delta ELPD)$$
 
@@ -698,7 +698,7 @@ knitr::include_graphics(
 
 ### GII.4 results
 
-@fig-pow-gii4-measures-vs illustrates the relationships between antibody kinetic measures (growth rate, peak response, and decay rate) and predicted response at one year for GII.4 antibodies in the NV study, as shown in Figure 6 of the main text. @fig-pow-gii4-peak-decay-1year shows the joint relationship between peak response, decay rate, and predicted response at one year for GII.4 antibodies, as shown in Figure 7 of the main text.
+@fig-pow-gii4-measures-vs illustrates the relationships between antibody kinetic measures (growth rate, peak response, and decay rate) and predicted response at one year for GII.4 antibodies in the NV study, as shown in Figure 5 of the main text. @fig-pow-gii4-peak-decay-1year shows the joint relationship between peak response, decay rate, and predicted response at one year for GII.4 antibodies, as shown in Figure 6 of the main text.
 
 ```{r}
 #| label: fig-pow-gii4-measures-vs
@@ -802,7 +802,7 @@ readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GII_4_IgG.r
 
 ## Exponential-decay model results
 
-The @fig-ni-exp-measures to @fig-exp-peak-decay-1year correspond to Figures 2-7 in the main text but present results from the exponential decay model rather than the power-law model. @fig-exp-gii4-measures-vs and @fig-exp-gii4-peak-decay-1year show GII.4 antibody results under the exponential model, analogous to those presented for the power-law model in @fig-pow-gii4-measures-vs and @fig-pow-gii4-peak-decay-1year.
+The @fig-ni-exp-measures to @fig-exp-peak-decay-1year correspond to Figures 2-6 in the main text but present results from the exponential decay model rather than the power-law model. @fig-exp-gii4-measures-vs and @fig-exp-gii4-peak-decay-1year show GII.4 antibody results under the exponential model, analogous to those presented for the power-law model in @fig-pow-gii4-measures-vs and @fig-pow-gii4-peak-decay-1year.
 
 ```{r}
 #| label: fig-ni-exp-measures
@@ -880,7 +880,7 @@ To assess the sensitivity of this choice, we performed additional analyses using
 
 ### Larger lower bound ($10^{-2}$)
 
-The following table and figures correspond to Table 1 and Figures 2-5 in the main text, but were generated using a lower censoring bound of $10^{-2}$ for interval-censored observations (i.e., observations below the limit of detection).
+The following table and figures correspond to Table 1 and Figures 2-4 in the main text, but were generated using a lower censoring bound of $10^{-2}$ for interval-censored observations (i.e., observations below the limit of detection).
 
 ```{r}
 #| label: fig-ni-outcome-alt1
@@ -937,7 +937,7 @@ knitr::include_graphics(
 
 ### Smaller lower bound ($10^{-14}$)
 
-The following figures and table correspond to Figures 2-5 and Table 1 in the main text, but were generated using a lower censoring bound of $10^{-14}$ for interval-censored observations (i.e., observations below the limit of detection).
+The following figures and table correspond to Figures 2-4 and Table 1 in the main text, but were generated using a lower censoring bound of $10^{-14}$ for interval-censored observations (i.e., observations below the limit of detection).
 
 ```{r}
 #| label: fig-ni-outcome-alt2
@@ -1031,7 +1031,7 @@ knitr::include_graphics(
 
 ## Sensitivity analysis of antibody kinetics relative to baseline
 
-@fig-ni-pow-measures-absolute and @fig-nv-pow-measures-absolute present peak and predicted one-year titers as kinetic measures, in the same context as Figures 4 and 5 of the main text, to assess the impact of baseline antibody levels on post-challenge or post-vaccination response kinetics. @fig-absolute-measures-vs and @fig-absolute-peak-decay-1year examine these measures within the same framework as Figures 6 and 7 of the main text. @fig-pow-gii4-absolute-measures-vs and @fig-pow-gii4-absolute-peak-decay-1year are analogous to @fig-pow-gii4-measures-vs and @fig-pow-gii4-peak-decay-1year but consider absolute measures.
+@fig-ni-pow-measures-absolute and @fig-nv-pow-measures-absolute present peak and predicted one-year titers as kinetic measures, in the same context as Figures 3 and 4 of the main text, to assess the impact of baseline antibody levels on post-challenge or post-vaccination response kinetics. @fig-absolute-measures-vs and @fig-absolute-peak-decay-1year examine these measures within the same framework as Figures 5 and 6 of the main text. @fig-pow-gii4-absolute-measures-vs and @fig-pow-gii4-absolute-peak-decay-1year are analogous to @fig-pow-gii4-measures-vs and @fig-pow-gii4-peak-decay-1year but consider absolute measures.
 
 In the NI study, baseline titers were generally balanced across dose groups for GI.1 HBGA, though the 4800 dose group had slightly lower IgA and IgG baselines. Peak response for HBGA decreased slightly with increasing dose, and this pattern was more pronounced when examining peak titers. Although the 4800 dose produced the largest IgA peak response, it had the smallest estimated peak titer. Similarly, while the 4800 dose had the largest predicted one-year response, absolute one-year titers were comparable across doses. IgG peak responses were similar across doses, but peak titers for the 4800 dose were lower than the other doses. These differences did not meaningfully affect one-year outcomes, as both response-based and absolute titers were similar across doses.
 
