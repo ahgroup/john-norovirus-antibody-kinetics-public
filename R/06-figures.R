@@ -845,6 +845,172 @@ func_plot_schematic <- function(dat_pred, file_path, width, height) {
   return(p)
 }
 
+func_plot_spaghetti <- function(data, filepath, width, height) {
+  browser()
+  library(ggplot2)
+  
+  if (unique(data$study)[1] == "NI") {
+    max_day <- max(data$day, na.rm = TRUE) + 8
+  } else {
+    max_day <- max(data$day, na.rm = TRUE)
+  }
+  
+  # when multiple runs, take average for trajectory
+  data_line <- data %>%
+    mutate(
+      value = ifelse(cens == 0, y, y2),
+      dose  = droplevels(dose)
+    ) %>%
+    group_by(id, day, dose, antibody_clean) %>%
+    summarise(
+      value = mean(value),
+      .groups = "drop"
+    ) %>%
+    distinct()
+  
+  p <- ggplot(data, aes(x = day, y = ifelse(cens == 0, y, y2), group = id)) +
+    geom_line(
+      data = data_line,
+      aes(
+        x = day,
+        y = value,
+        group = id
+      ),
+      alpha = 0.4
+    ) +
+    geom_point(aes(shape = factor(ifelse(cens == 0, "circle", "tri"))),
+               size = 1) +
+    scale_shape_manual(
+      values = c("circle" = 1, "tri" = 2),
+      guide  = "none"
+    ) +
+    scale_y_log10(
+      breaks = c(1, 10, 100, 1000),
+      expand = c(0, 0)
+    ) +
+    coord_cartesian(xlim = c(0, max_day), ylim = c(0.5, 5000)) +
+    facet_grid(dose ~ antibody_clean, switch = "y") +
+    labs(
+      x = "Days post-inoculation",
+      y = "Titer"
+    ) +
+    theme_bw() +
+    theme(
+      axis.text  = element_text(size = 11),
+      axis.title = element_text(size = 16),
+      strip.text = element_text(size = 12)
+    )
+  
+  ggsave(
+    filename = filepath,
+    plot = p,
+    width = width,
+    height = height
+  )
+  
+  return(p)
+  
+}
+
+func_plot_trace <- function(models, filepath, width, height) {
+  browser()
+  library(brms)
+  library(ggplot2)
+  
+  plots <- list()
+  
+  for (m in names(models)) {
+    
+    fit <- models[[m]]
+    
+    # Posterior draws
+    draws <- as_draws_df(fit) %>%
+      select(.chain, .iteration, starts_with("b_")) %>%
+      tidyr::pivot_longer(
+        cols = -c(.chain, .iteration),
+        names_to = "parameter",
+        values_to = "value"
+      ) %>%
+      mutate(model = m)
+    
+    # process draws 
+    draws_processed <- draws %>%
+      mutate(
+        dose = factor(
+          case_when(
+            stringr::str_detect(parameter,"dose4\\.8") ~ "4.8",
+            stringr::str_detect(parameter,"dose4800") ~ "4800",
+            stringr::str_detect(parameter,"dose48") ~ "48",
+            stringr::str_detect(parameter,"dose50") ~ "50",
+            stringr::str_detect(parameter,"dose150") ~ "150",
+            stringr::str_detect(parameter,"dose5") ~ "5",
+            stringr::str_detect(parameter,"dose15") ~ "15",
+            TRUE ~ NA_character_
+          ),
+          levels = c("4.8","48","4800","5","15","50","150")
+        ),
+        parameter = case_when(
+          stringr::str_detect(parameter,"b_d") ~ "d",
+          stringr::str_detect(parameter,"b_k") ~ "k",
+          stringr::str_detect(parameter,"b_g") ~ "g",
+          stringr::str_detect(parameter,"b_p") ~ "p",
+          TRUE ~ NA_character_
+        )
+      ) %>%
+      dplyr::filter(.iteration %% 10 == 0)
+    
+    name <- paste(
+      stringr::str_sub(m, 1, 2),
+      ifelse(stringr::str_detect(m, "exp"), "Exponential",
+             ifelse(stringr::str_detect(m, "pow"), "Power-Law", "")),
+      stringr::str_split_fixed(m, "_", 3)[,3] %>% 
+        stringr::str_replace_all("_", " ")
+    )
+    
+    p <- ggplot(
+      draws_processed,
+      aes(
+        x = .iteration,
+        y = value,
+        colour = factor(.chain),
+        group = .chain
+      )
+    ) +
+      geom_line(alpha = 0.6, linewidth = 0.3) +
+      ggh4x::facet_grid2(
+        rows = vars(dose), 
+        cols = vars(parameter), 
+        scales = "free", 
+        independent = "y", 
+        switch = "y"
+      ) +
+      theme_bw() +
+      labs(
+        title = name,
+        x = "Iteration",
+        y = "Value",
+        colour = "Chain"
+      ) +
+      theme(
+        legend.position = "bottom"
+      )
+    
+    # Store plot
+    plots[[m]] <- p
+    
+    # Save plot
+    ggsave(
+      filename = file.path(filepath, paste0(m, ".png")),
+      plot = p,
+      width = width,
+      height = height
+    )
+  }
+  
+  return(plots)
+  
+}
+
 func_plot_prior_posterior_draws <- function(draws, file_path, width, height) {
   
   library(ggplot2)
@@ -926,12 +1092,86 @@ func_plot_prior_posterior_draws <- function(draws, file_path, width, height) {
   
 }
 
-func_plot_fitted_vs_observed <- function(residuals, file_path, width, height) {
+func_plot_pairwise <- function(models, filepath, width, height) {
+  browser()
+  library(ggplot2)
+  
+  plots <- list()
+  
+  for (m in names(models)) {
+    
+    fit <- models[[m]]
+    
+    draws <- brms::as_draws_df(fit)
+    
+    dose_names <- names(draws)[
+      grepl("^b_g_dose", names(draws))
+    ] %>%
+      stringr::str_replace("^b_g_", "")
+    
+    for (dose in dose_names) {
+      
+      # parameters for this dose only
+      pars <- c(
+        paste0("b_g_", dose),
+        paste0("b_k_", dose),
+        paste0("b_p_", dose),
+        paste0("b_d_", dose)
+      )
+      
+      # remove missing parameters (in case some models differ)
+      pars <- pars[pars %in% names(draws)]
+      
+      # title for plots
+      study <- stringr::str_extract(m, "^[^_]+")
+      
+      model_type <- dplyr::case_when(
+        stringr::str_detect(m, "_pow_") ~ "Power-law",
+        stringr::str_detect(m, "_exp_") ~ "Exponential",
+        TRUE ~ ""
+      )
+      
+      antibody <- stringr::str_remove(
+        m,
+        "^[^_]+_(pow|exp)_"
+      )
+      
+      name <- paste(
+        study,
+        model_type,
+        antibody,
+        paste0("Dose ", stringr::str_remove(dose, "^dose"))
+      )
+      
+      # plot
+      p <- bayesplot::mcmc_pairs(
+        draws,
+        pars = pars,
+        grid_args = list(top = name)
+      )
+      
+      plot_name <- paste0(m, "_", dose)
+      
+      plots[[plot_name]] <- p
+      
+      ggplot2::ggsave(
+        filename = file.path(filepath, paste0(plot_name, ".png")),
+        plot = p,
+        width = width,
+        height = height,
+        bg = "white"
+      )
+    }
+  }
+  
+}
+
+func_plot_fitted_observed <- function(residuals, filepath, width, height) {
   
   library(ggplot2)
   library(patchwork)
   
-  plots <- list()
+  fitted_plots <- list()
   
   for (m in unique(residuals$model)) {
     
@@ -945,6 +1185,9 @@ func_plot_fitted_vs_observed <- function(residuals, file_path, width, height) {
     
     residuals_sub <- residuals %>% filter(model == m)
     
+    max_value <- max(max(residuals_sub$logy_obs), max(residuals_sub$logy_pred)) + 5
+    min_value <- min(min(residuals_sub$logy_obs), min(residuals_sub$logy_pred)) - 5
+    
     # custom colors
     if (unique(residuals_sub$study) == "NI") {
       dose_colors <- ggokabeito::palette_okabe_ito(c(1,7,6))
@@ -954,35 +1197,51 @@ func_plot_fitted_vs_observed <- function(residuals, file_path, width, height) {
     
     names(dose_colors) <- sort(unique(residuals_sub$dose))
     
-    max <- max(max(residuals_sub$y_obs), max(residuals_sub$y_pred)) + 5
-    
-    plots[[m]] <- ggplot(residuals_sub, aes(x=y_obs, y=y_pred, color=dose)) +
-      geom_point(alpha=0.7) +
-      geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +
-      coord_cartesian(xlim = c(0,max), ylim = c(0,max)) +
+    # Fitted vs observed
+    fitted_plots[[m]] <- ggplot(
+      residuals_sub,
+      aes(x = logy_obs, y = logy_pred, color = dose)
+    ) +
+      geom_point(alpha = 0.7) +
+      geom_abline(
+        intercept = 0,
+        slope = 1,
+        linetype = "dashed",
+        color = "black"
+      ) +
+      coord_cartesian(
+        xlim = c(0, max_value),
+        ylim = c(0, max_value)
+      ) +
       scale_color_manual(values = dose_colors) +
       theme_bw() +
-      labs(title=name,
-           y="Predicted value",
-           x="Observed value") +
+      labs(
+        title = name,
+        y = "Predicted value",
+        x = "Observed value"
+      ) +
       theme(
-        plot.title = element_text(size=10)
+        plot.title = element_text(size = 10)
       )
+    
   }
   
-  combined <- wrap_plots(plots, ncol = 3, guides = "collect") & 
-    theme(
-      legend.position = "bottom"
-    )
+  # combine fitted vs observed plots
+  fitted_combined <- wrap_plots(
+    fitted_plots,
+    ncol = 3,
+    guides = "collect"
+  ) &
+    theme(legend.position = "bottom")
   
   ggsave(
-    filename = file_path,
-    plot = combined,
+    filename = paste0(filepath, "fitted-observed.png"),
+    plot = fitted_combined,
     width = width,
     height = height
   )
   
-  return(plots)
+  return(fitted_plots)
   
 }
 
@@ -1087,6 +1346,110 @@ func_plot_id_model <- function(predictions, data, ncols, zoom=FALSE,
     
   }
 }
+
+func_plot_random_effects <- function(models, filepath, width, height) {
+
+  library(ggplot2)
+  
+  all_df <- list()
+  
+  for (m in names(models)) {
+    
+    fit <- models[[m]]
+    
+    re <- brms::ranef(fit)$id
+    
+    pars <- dimnames(re)[[3]]
+    
+    df <- purrr::map_dfr(pars, function(par) {
+      
+      tibble(
+        id = dimnames(re)[[1]],
+        parameter = stringr::str_remove(par, "_Intercept"),
+        median = re[, "Estimate", par]
+      )
+      
+    })
+    
+    df <- df %>%
+      mutate(
+        study = stringr::str_extract(m, "^[^_]+"),
+        model = case_when(
+          stringr::str_detect(m, "_exp_") ~ "Exponential",
+          stringr::str_detect(m, "_pow_") ~ "Power-law"
+        ),
+        antibody = stringr::str_remove(
+          m,
+          "^[^_]+_(exp|pow)_"
+        ) %>%
+          stringr::str_replace_all("_", " ")
+      )
+    
+    all_df[[m]] <- df
+    
+  }
+  
+  df_all <- bind_rows(all_df)
+  
+  
+  # make one figure per study + model type
+  for (study_current in unique(df_all$study)) {
+    
+    for (model_current in unique(df_all$model)) {
+      
+      df <- df_all %>%
+        filter(
+          study == study_current,
+          model == model_current
+        )
+      
+      p <- ggplot(
+        df,
+        aes(x = median)
+      ) +
+        geom_density(fill = "grey80") +
+        geom_vline(
+          xintercept = 0,
+          linetype = 2
+        ) +
+        ggh4x::facet_grid2(
+          antibody ~ parameter,
+          scales = "free", 
+          independent = "all",
+          switch="y"
+        ) +
+        theme_bw() +
+        labs(
+          title = paste(
+            study_current,
+            model_current
+          ),
+          x = "Individual-level deviation from population mean",
+          y = "Density"
+        )
+      
+      ggsave(
+        filename = file.path(
+          filepath,
+          paste0(
+            study_current,
+            "_",
+            model_current,
+            "_random_effects.png"
+          )
+        ),
+        plot = p,
+        width = width,
+        height = height,
+        bg = "white"
+      )
+      
+    }
+  }
+  
+}
+
+
 
 func_plot_decay_rates <- function(setup, dat_group, model_name, 
                                   study_name, filepath, height, width) {
@@ -1330,6 +1693,419 @@ func_plot_pairwise_compare <- function(probabilities, model,
     height = height,
     width = width
   )
+  
+}
+
+func_plot_prior_posterior_draws_sens <- function(draws_main, draws_sens, 
+                                                 file_path, width, height) {
+  
+  library(ggplot2)
+  
+  process_draws <- function(draws, prior_label) {
+    draws %>%
+      mutate(
+        prior_spec = prior_label,
+        dose = factor(
+          case_when(
+            stringr::str_detect(parameter, "dose4\\.8") ~ "4.8",
+            stringr::str_detect(parameter, "dose4800")  ~ "4800",
+            stringr::str_detect(parameter, "dose48")    ~ "48",
+            stringr::str_detect(parameter, "dose50")    ~ "50",
+            stringr::str_detect(parameter, "dose150")   ~ "150",
+            stringr::str_detect(parameter, "dose5")     ~ "5",
+            stringr::str_detect(parameter, "dose15")    ~ "15",
+            TRUE ~ NA_character_
+          ),
+          levels = c("4.8","48","4800","5","15","50","150")
+        ),
+        parameter = case_when(
+          stringr::str_detect(parameter, "b_d")         ~ "d",
+          stringr::str_detect(parameter, "b_k")         ~ "k",
+          stringr::str_detect(parameter, "b_g")         ~ "g",
+          stringr::str_detect(parameter, "b_p")         ~ "p",
+          stringr::str_detect(parameter, "sigma")       ~ "sigma",
+          stringr::str_detect(parameter, "nu")          ~ "nu",
+          stringr::str_detect(parameter, "p_Intercept") ~ "p_Intercept",
+          stringr::str_detect(parameter, "g_Intercept") ~ "g_Intercept",
+          stringr::str_detect(parameter, "k_Intercept") ~ "k_Intercept",
+          stringr::str_detect(parameter, "d_Intercept") ~ "d_Intercept",
+          TRUE ~ NA_character_
+        )
+      )
+  }
+  
+  draws_processed <- bind_rows(
+    process_draws(draws_main, "Main"),
+    process_draws(draws_sens, "Sensitivity")
+  ) %>%
+    mutate(
+      Distribution = paste(type, prior_spec)  # e.g. "prior Main", "posterior Sensitivity"
+    )
+  
+  plots <- list()
+  
+  for (m in unique(draws_processed$model)) {
+    
+    name <- paste(
+      stringr::str_sub(m, 1, 2),
+      ifelse(stringr::str_detect(m, "exp"), "Exponential",
+             ifelse(stringr::str_detect(m, "pow"), "Power-Law", "")),
+      stringr::str_split_fixed(m, "_", 3)[, 3] %>%
+        stringr::str_replace_all("_", " ")
+    )
+    
+    draws_sub <- draws_processed %>% filter(model == m)
+    
+    plots[[m]] <- ggplot(draws_sub, aes(x = value, fill = Distribution, color = Distribution)) +
+      geom_density(alpha = 0.4) +
+      ggh4x::facet_grid2(
+        rows        = vars(dose),
+        cols        = vars(parameter),
+        scales      = "free",
+        independent = "y",
+        switch      = "y"
+      ) +
+      theme_bw() +
+      labs(
+        title  = name
+      ) +
+      theme(
+        legend.position = "bottom",
+        legend.key.size = unit(0.4, "cm")
+      )
+  }
+  
+  for (m in names(plots)) {
+    ggsave(
+      filename = paste0(file_path, "/", m, ".png"),
+      plot     = plots[[m]],
+      width    = width,
+      height   = height
+    )
+  }
+  
+  return(plots)
+  
+}
+
+func_plot_group_model_traj_linear <- function(predictions, data,
+                                       filepath, height, width) {
+  
+  library(ggplot2)
+  
+  if (unique(data$study)[1] == "NI") {
+    max_day <- max(data$day, na.rm = TRUE) + 8
+  } else {
+    max_day <- max(data$day, na.rm = TRUE)
+  }
+  
+  p <- ggplot(predictions) +
+    geom_line(aes(x=day, y=y,
+                  col=model,
+                  linetype=model),
+              size=1) +
+    scale_y_continuous(expand=c(0,0)) +
+    coord_cartesian(xlim=c(0,max_day)) +
+    ggh4x::facet_grid2(dose ~ antibody_clean, switch = "y", scales = "free", independent = "y") +
+    ggokabeito::scale_color_okabe_ito(
+      labels=c("exp"="Exponential decay", "pow"="Power-law decay")
+    ) +
+    scale_linetype_discrete(
+      labels=c("exp"="Exponential decay", "pow"="Power-law decay"), 
+      guide="legend") +
+    labs(x="Days post-exposure",
+         y="Titer",
+         linetype="Model",
+         col="Model") +
+    theme_bw() +
+    theme(legend.position="bottom",
+          axis.text = element_text(size=11),
+          axis.title = element_text(size=16),
+          strip.text = element_text(size=12),
+          legend.text = element_text(size=12),
+          legend.title = element_text(size=14))
+  
+  ggsave(
+    filename = filepath,
+    plot = p,
+    width = width,
+    height = height
+  )
+  
+  return(p)
+  
+}
+
+func_plot_measures_auc <- function(setup, dat_group, 
+                                        model_name, study_name, 
+                                        filepath, height, width) {
+  library(ggplot2)
+  library(patchwork)
+  
+  measures = c(
+    "peak_response",
+    "decay_rate_D90",
+    "response_1year",
+    "auc_peak_1year"
+  )
+  
+  dat_group_process <- dat_group %>%
+    filter(
+      model_func==model_name,
+      study==study_name,
+      measure %in% measures
+    ) %>%
+    mutate(
+      plot_type = factor(case_when(
+        measure == "peak_response" ~ "Peak response",
+        measure == "decay_rate_D90" ~ "Decay rate D90",
+        measure == "response_1year" ~ "1-year response",
+        measure == "auc_peak_1year" ~ "AUC",
+      ), levels = c("Peak response",
+                    "Decay rate D90",
+                    "1-year response",
+                    "AUC")),
+      antibody = factor(antibody),
+      dose = factor(dose, 
+                    levels = c("4.8","48","4800",
+                               "5","15","50","150"))
+    )
+  
+  # get color scale
+  full_palette <- ggokabeito::palette_okabe_ito()
+  if (study_name == "NI") {
+    color_subset <- full_palette[c(1,7,6)]
+    growth_y_max <- .05
+    peak_time_y_max <- 30
+    x_axis_size <- 10
+  } else {
+    color_subset <- full_palette[c(2,5,3,8)]
+    growth_y_max <- .5
+    peak_time_y_max <- 18
+    x_axis_size <- 7
+  }
+  
+  p <- ggplot() +
+    geom_pointrange(
+      data = dat_group_process,
+      aes(x=dose,
+          y=est,
+          ymin = lo, 
+          ymax = up, 
+          color = dose,
+          shape = dose,
+          fill=dose),
+      fatten = 3
+    ) +
+    scale_color_manual(values = color_subset) +
+    scale_fill_manual(values = color_subset) +
+    scale_shape_manual(values = c(21, 24, 22, 25)) +
+    ggh4x::facet_grid2(vars(plot_type), vars(antibody), switch="y",
+                       scales="free"
+    ) +
+    ggh4x::facetted_pos_scales(
+      y = list(
+        #plot_type == "Baseline" ~ scale_y_log10(breaks=c(0.1, 1, 10, 100)),
+        plot_type %in% c("AUC") ~ scale_y_log10(),
+        plot_type %in% c("Peak response","Decay rate D90","1-year response") ~ scale_y_continuous()
+      )
+    ) +
+    labs(x = "Dose",
+         color="Dose",
+         shape="Dose",
+         fill="Dose") +
+    theme_bw() + 
+    theme(axis.title.y = element_blank(),
+          legend.position = "bottom",
+          axis.text = element_text(size=7))
+  
+  ggsave(
+    filename = filepath,
+    plot = p,
+    width = width,
+    height = height
+  )
+  
+  return(p)
+}
+
+func_plot_obs_measures <- function(measures, filepath, height, width) {
+  
+  library(ggplot2)
+  library(patchwork)
+  
+  plots <- list(
+    
+    peak_final = ggplot(
+      measures,
+      aes(x = peak, y = final_val)
+    ) +
+      geom_point(alpha = 0.7) +
+      geom_smooth(
+        method = "lm",
+        se = FALSE,
+        color = "red",
+        linetype = "dashed"
+      ) +
+      scale_x_log10() +
+      scale_y_log10() +
+      facet_wrap(~ antibody_clean, scales = "free") +
+      theme_bw() +
+      labs(
+        x = "Observed peak",
+        y = "Final observed value"
+      ),
+    
+    decay_final = ggplot(
+      measures,
+      aes(x = decay, y = final_val)
+    ) +
+      geom_point(alpha = 0.7) +
+      geom_smooth(
+        method = "lm",
+        se = FALSE,
+        color = "red",
+        linetype = "dashed"
+      ) +
+      scale_y_log10() +
+      facet_wrap(~ antibody_clean, scales = "free") +
+      theme_bw() +
+      labs(
+        x = "Observed decay rate",
+        y = "Final observed value"
+      ),
+    
+    peak_decay = ggplot(
+      measures,
+      aes(x = peak, y = decay)
+    ) +
+      geom_point(alpha = 0.7) +
+      geom_smooth(
+        method = "lm",
+        se = FALSE,
+        color = "red",
+        linetype = "dashed"
+      ) +
+      scale_x_log10() +
+      facet_wrap(~ antibody_clean, scales = "free") +
+      theme_bw() +
+      labs(
+        x = "Observed peak",
+        y = "Observed decay rate"
+      ),
+    
+    peak_day_growth = ggplot(
+      measures,
+      aes(x = peak_day, y = growth)
+    ) +
+      geom_point(alpha = 0.7) +
+      geom_smooth(
+        method = "lm",
+        se = FALSE,
+        color = "red",
+        linetype = "dashed"
+      ) +
+      facet_wrap(~ antibody_clean, scales = "free") +
+      theme_bw() +
+      labs(
+        x = "Observed peak day",
+        y = "Observed growth rate"
+      )
+  )
+  
+  for (plot_name in names(plots)) {
+    
+    ggsave(
+      filename = paste0(filepath, plot_name, ".png"),
+      plot = plots[[plot_name]],
+      width = width,
+      height = height
+    )
+    
+  }
+  
+  return(plots)
+  
+}
+
+# test ====
+func_plot_group_model_traj_flexible <- function(predictions_original, 
+                                                predictions_flexible, data, 
+                                                main=NULL,
+                                                filepath, height, width) {
+  
+  library(ggplot2)
+  
+  predictions_original <- predictions_original %>%
+    filter(model == "pow") %>%
+    mutate(
+      model_type = "original"
+    )
+  
+  predictions_flexible <- predictions_flexible %>%
+    mutate(
+      model_type = "flexible"
+    )
+  
+  predictions <- rbind(predictions_original, predictions_flexible)
+  
+  if (unique(data$study)[1] == "NI") {
+    max_day <- max(data$day, na.rm = TRUE) + 8
+  } else {
+    max_day <- max(data$day, na.rm = TRUE)
+  }
+  
+  legend_position <- if (!is.null(main)) "none" else "bottom"
+  
+  p <- ggplot(predictions) +
+    geom_line(aes(x=day, y=y,
+                  col=model_type,
+                  linetype=model_type),
+              size=1) +
+    geom_ribbon(aes(x=day, ymin=lo, ymax=up, fill=model_type),
+                alpha=0.1, show.legend = FALSE) +
+    scale_y_log10(breaks=c(1,10,100,1000),
+                  expand=c(0,0)) +
+    coord_cartesian(xlim=c(0,max_day), ylim=c(0.5,5000)) +
+    geom_point(data=data, 
+               mapping=aes(x=day, y=ifelse(cens==0, y, y2),
+                           group=id, shape=factor(ifelse(cens==0, "circle", "tri"))),
+               size=1) +
+    scale_shape_manual(
+      values = c("circle" = 1, "tri" = 2),
+      guide = "none"
+    ) +
+    facet_grid(dose~antibody_clean, switch="y") +
+    ggokabeito::scale_color_okabe_ito(
+      labels=c("original"="Original", "flexible"="Flexible")
+    ) +
+    ggokabeito::scale_fill_okabe_ito(
+      labels=c("original"="Original", "flexible"="Flexible"), 
+      guide="legend") +  
+    scale_linetype_discrete(
+      labels=c("original"="Original", "flexible"="Flexible"), 
+      guide="legend") +
+    labs(x="Days post-exposure",
+         y="Titer",
+         fill="Model",
+         linetype="Model",
+         col="Model") +
+    theme_bw() +
+    theme(legend.position=legend_position,
+          axis.text = element_text(size=11),
+          axis.title = element_text(size=16),
+          strip.text = element_text(size=12),
+          legend.text = element_text(size=12),
+          legend.title = element_text(size=14))
+  
+  ggsave(
+    filename = filepath,
+    plot = p,
+    width = width,
+    height = height
+  )
+  
+  return(p)
   
 }
 

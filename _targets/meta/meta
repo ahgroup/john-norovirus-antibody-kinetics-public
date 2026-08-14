@@ -1,167 +1,284 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 process_nv_demographics|stem|4e0d6184f298364c|2be0b176671b2ddb|2b502d6a2acf6297|-723673562||t20560.6033145757s|s567b|567|rds|local|vector|||0.172||
 process_ni_demographics|stem|4350f9d387e470db|d31f0e8421c710e0|5a9b6f3f57dd2f29|1487385597||t20560.6033174305s|s654b|654|rds|local|vector|||0.157||
-func_process_nv_demographics|function|1cf7fa2caa050d47
-func_process_ni_demographics|function|1cf7fa2caa050d47
+func_process_nv_demographics|function|1cf7fa2caa050d47|||||||||||||||
+func_process_ni_demographics|function|1cf7fa2caa050d47|||||||||||||||
 process_ni_data|stem|c692622b5a2e9812|17ed83a5d9779a14|29dd41586942e4d0|1826401572||t20566.8193316881s|s5515b|5515|rds|local|vector|||0.282||
 process_nv_data|stem|e11eeb31d8c2f51a|19aa8b63993721f6|8d34143dfbdd2e8e|-1311495975||t20566.8195338515s|s28318b|28318|rds|local|vector|||0.125||
 alt_process_ni_data|stem|6bac2eb46f02ac52|ff3754a39ae88b21|a3697348f0bf1558|1678969987||t20566.892672428s|s10893b|10893|rds|local|vector|||0.015||
 alt_process_nv_data|stem|b92eafd74647ae57|3579c62616553fcc|dd2abbf2817ec178|116917491||t20566.9166679553s|s56474b|56474|rds|local|vector|||0||
 fig_setup|stem|7d35c765d255883c|a9f787fb2905a286|0143c2893a926119|-755077099||t20567.5770989075s|s226b|226|rds|local|vector|||0.203||
-alt1_plot_ni_pow_measures|stem|35928c0d4db27e62|b77b22b363695553|0c8d05158f0f4c11|1602519536||t20567.5819945715s|s688048b|688048|rds|local|vector|||4.609|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-alt2_plot_ni_pow_measures|stem|8fd46cab7b22fec9|12dcec148817351c|ce0f699eb1edfee4|-1919396998||t20567.582025982s|s688021b|688021|rds|local|vector|||2.109||
-process_ni_group_draws|stem|7514713a58ef2496|58638bc06ddd2d16|fe0fc264663b2dbb|-829789670||t20567.5820457064s|s11596421b|11596421|rds|local|vector|||0.562||
-plot_ni_decay_rates|stem|fc40a57e072d1f8b|50badecad13aab4c|7085d1d8a67695da|1630319924||t20567.5820598425s|s599022b|599022|rds|local|vector|||1.766||
-plot_ni_pow_absolute_measures|stem|b9c49684147d0aeb|c34b63e902dc1b90|9ff29848f304bdb8|-1320637983||t20567.582069373s|s678663b|678663|rds|local|vector|||2.563|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-plot_ni_exp_measures|stem|bebacd5f8f4499de|952e509546c70bf9|76bf24f3bcd2d44e|-635489814||t20567.5820700235s|s687958b|687958|rds|local|vector|||2.547|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-plot_ni_pow_measures|stem|95f8174c460504d4|00ac84cb615309f4|76bf24f3bcd2d44e|923641155||t20567.5820706304s|s687986b|687986|rds|local|vector|||2.656|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-alt1_plot_nv_pow_measures|stem|e74f3664d1208c87|7fb2937c6092d84b|feb05cf6b03b2fed|1890822884||t20567.5844225726s|s697844b|697844|rds|local|vector|||2.125||
-process_nv_group_draws|stem|dac3ac20799a50b7|f001c3a2d37cec12|94ba7b4b14a11407|59988835||t20567.5844246254s|s25730691b|25730691|rds|local|vector|||1.078||
-plot_nv_decay_rates|stem|c385fb6081f129d4|a60596ac64835da3|9fc8f3c8f75bcb08|1528255470||t20567.5844308497s|s608943b|608943|rds|local|vector|||2.812|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-plot_nv_pow_measures|stem|f4be953078f116a2|d8b2218bf70f481c|b7422e062d3dbc5f|1824901199||t20567.5844336489s|s697791b|697791|rds|local|vector|||2.921|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-plot_nv_exp_measures|stem|9d4d3fe4ef00472a|b87f269ca9c1ecb9|b7422e062d3dbc5f|786740560||t20567.5844393573s|s697375b|697375|rds|local|vector|||2.937||
-plot_nv_pow_absolute_measures|stem|0b8337a79c9209a6|cf20c62c0f30b3d1|79d9b7d19e46cdb0|102593818||t20567.5844398144s|s698268b|698268|rds|local|vector|||3.344||
-alt2_plot_nv_pow_measures|stem|a294f84cdca7f6a2|920a28348e379934|9da7f617c9bb0cad|-234989958||t20567.5844497074s|s697885b|697885|rds|local|vector|||2.953|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
-plot_exp_group_peak_decay_1year_draws|stem|58ac739a67688c87|89320171d6a372b4|4a01eae9f0599986|-1590659838||t20567.5845052102s|s15540154b|15540154|rds|local|vector|||0.922||
-plot_gii4_pow_group_peak_decay_draws|stem|b7d5258914b03f13|772460dfdde3b12a|6595d8695f26dc94|-1704916211||t20567.5845195328s|s11543032b|11543032|rds|local|vector|||0.61||
-plot_pow_group_peak_decay60_1year_draws|stem|9b2c47d2fe02b225|6f720353c5d7bc8a|4a01eae9f0599986|1969659228||t20567.5845290979s|s16826200b|16826200|rds|local|vector|||1.859||
-plot_pow_absolute_group_peak_decay_draws|stem|d3005364565526f1|619b3bdcc0017277|6595d8695f26dc94|1033887037||t20567.5845389409s|s18766972b|18766972|rds|local|vector|||1.265||
-plot_pow_group_peak_decay180_1year_draws|stem|8eab092d8862b49f|79849968a60daeea|4a01eae9f0599986|-667252716||t20567.5845398176s|s16838477b|16838477|rds|local|vector|||1.219||
-plot_exp_group_peak_decay_draws|stem|4aedd5e4a3636ddd|1174324c626ac70a|6595d8695f26dc94|489416235||t20567.5845737382s|s17457561b|17457561|rds|local|vector|||3.735||
-plot_gii4_pow_absolute_group_peak_decay_draws|stem|5100abb8da25c204|1f403a2df708e8ab|6595d8695f26dc94|-839324550||t20567.5845853982s|s11548694b|11548694|rds|local|vector|||0.5||
-plot_gii4_pow_group_peak_decay_1year_draws|stem|0589ad190fac3975|8bb5d6189b40dc3c|4a01eae9f0599986|1752455499||t20567.5846030689s|s10244716b|10244716|rds|local|vector|||0.547||
 get_correlations_overall|stem|32233cdc94ebad46|341a2b9e9ee0e0bf|22760fac5b9e65a2|649254524||t20567.5846369353s|s1145b|1145|rds|local|vector|||5.282||
-plot_gii4_exp_group_peak_decay_draws|stem|95e625414e8e0516|9e543fdbe67c0233|6595d8695f26dc94|1343966323||t20567.5846723635s|s10919535b|10919535|rds|local|vector|||0.485||
-plot_pow_group_peak_decay_1year_draws|stem|2a8cfd4736a12613|5154ba5b71d321ae|4a01eae9f0599986|-133777194||t20567.5846763192s|s16826079b|16826079|rds|local|vector|||0.734||
-plot_pow_absolute_group_peak_decay_1year_draws|stem|002cb8150f1fd89c|2aa4225ebdfb858b|4a01eae9f0599986|1271228194||t20567.5846764366s|s16847128b|16847128|rds|local|vector|||0.812||
 get_correlations_dose|stem|0ca30585134041dd|e0ea1c78a66500d8|22760fac5b9e65a2|2024574793||t20567.5861917895s|s4972b|4972|rds|local|vector|||3.625||
-plot_pow_group_peak_decay365_1year_draws|stem|f7745ccd90205fb0|cf266a35c78f6a7a|4a01eae9f0599986|1179435250||t20567.5861951942s|s16825217b|16825217|rds|local|vector|||1.047||
-plot_gii4_pow_comb_peak_decay_vs|stem|820f80315533b135|2337a53ee258406e|d0c83ba093329294|892064640||t20567.5862013703s|s182b|182|rds|local|vector|||2.172||
-plot_pow_group_peak_decay_draws|stem|fb92e301cd74ed8e|a37180468145fb30|6595d8695f26dc94|403304980||t20567.5862027001s|s18748810b|18748810|rds|local|vector|||1||
-plot_exp_comb_peak_decay_vs|stem|bff3d5a0a1819bee|58c6f39c1d6ec049|36ce6d26377de0db|132218618||t20567.58622131s|s186b|186|rds|local|vector|||2.984||
-plot_pow_absolute_comb_peak_decay_vs|stem|bf949ad8783a2cab|f435927af59f6057|056cb619a02c7de6|265282835||t20567.5862304831s|s178b|178|rds|local|vector|||3.125||
-plot_pow_comb_peak_decay_vs|stem|72d8378d3c487d5b|317de0e09d94efeb|11f74b5cf1d34910|-206038097||t20567.5862781848s|s164b|164|rds|local|vector|||2.282||
-plot_comb_pow_group_peak_decay_1year_draws|stem|bc63a03a5f60cf00|9cecafae1764b2a1|a644b904ad60f4e9|1873303218||t20567.5862866417s|s166b|166|rds|local|vector|||3.609||
 plot_ni_fitted_vs_observed|stem|9e53d75dede6f333|38f72db5b5555e98|28175f74a7a78b87|-821852849||t20567.5933218746s|s2569198b|2569198|rds|local|vector|||4.016||
 plot_nv_fitted_vs_observed|stem|1d4eef76b42f269d|f9211541e0478519|67d36bf60838b5eb|-1947101728||t20567.6101615297s|s4428299b|4428299|rds|local|vector|||5.031||
-.Random.seed|object|dbe09eeb59671571
-ni_pp|object|e93d4a0601da9b15
-nv_pp|object|36b9f53b6b4bed1f
-plot_gii4_pow_absolute_group_peak_decay_1year_draws|stem|0849150b3c592eeb|9330017c6414b20d|4a01eae9f0599986|1482036068||t20567.6283798048s|s10246676b|10246676|rds|local|vector|||1.359||
-plot_gii4_exp_group_peak_decay_1year_draws|stem|9955c8d6889d5cad|d6e41ab5d28e6052|4a01eae9f0599986|-1862021032||t20567.6283827419s|s9617699b|9617699|rds|local|vector|||1.297||
-plot_gii4_pow_absolute_comb_peak_decay_vs|stem|e70b436d3fc3bdda|64da4fded37b46db|639d7c71735bb4d7|-1492065820||t20567.6284382486s|s189b|189|rds|local|vector|||2.281|Removed 48 rows containing missing values or values outside the scale range (`geom_point()`).. Removed 48 rows containing missing values or values outside the scale range (`geom_point()`).|
-plot_gii4_exp_comb_peak_decay_vs|stem|d4b551cd11ab4383|c26ce722811e8467|c12d0c5f36f6e03d|1283134026||t20567.6284407071s|s195b|195|rds|local|vector|||2.14||
+ni_pp|object|e93d4a0601da9b15|||||||||||||||
+nv_pp|object|36b9f53b6b4bed1f|||||||||||||||
 tab_model_metrics|stem|fd0a57072a41eb19|e9576a6a743e0b29|40ea3d8823b1953e|-1709397853||t20567.6564086317s|s44b|44|rds|local|vector|||2.312||
 alt2_tab_model_metrics|stem|fd0a57072a41eb19|6cbf0f229e710351|98483c692b95e5be|409544724||t20567.6564084938s|s44b|44|rds|local|vector|||2.078||
 alt1_tab_model_metrics|stem|fd0a57072a41eb19|e94820404942ae88|3c82f11024a4574a|2038821704||t20567.6564084938s|s44b|44|rds|local|vector|||1.797||
 pairwise_compare_ni|stem|c3a8c9d4863a5381|96d3b4394fd8fb6b|ff239c06ffe780c1|-565911082||t20567.6564539437s|s1233b|1233|rds|local|vector|||4.297||
-tab_correlations_overall|stem|c8baf4c226a84627|3dcca49f0ecdd8cb|8b8338d6b1bb69f5|836038761||t20567.6564694539s|s162b|162|rds|local|vector|||5.422||
 plot_pairwise_compare_ni|stem|008cecda94bc1117|a01cf9b74439350b|6fcf54ce44a18b64|-1676318969||t20567.6564709393s|s177b|177|rds|local|vector|||1.375||
-tab_correlations_dose|stem|fd0a57072a41eb19|154963235b08049b|49957a3b85a351ae|-973187463||t20567.6565255075s|s44b|44|rds|local|vector|||9.938||
 pairwise_compare_nv|stem|7151e34867bc624e|1d1dc8e4c5755492|4cb8d3b6f5dbdb87|400843815||t20567.6565352676s|s2558b|2558|rds|local|vector|||11.875||
 plot_pairwise_compare_nv|stem|9d0cf14771fe0baa|b14070d6206b0084|d974052207b22755|587430809||t20567.6565450489s|s178b|178|rds|local|vector|||0.766||
-tab_n_ni_cens_obs|stem|0a86af75b67054bc|497e7eb68a33853e|daaf48dbc68001e0|-1508569104||t20567.6566777676s|s35864b|35864|rds|local|vector|||10.734||
-tab_n_nv_cens_obs|stem|dcf2d2b7b75d8048|490ea38b3e90dcb1|6b8b9a9253942d1a|-472621914||t20567.6568139609s|s85269b|85269|rds|local|vector|||22.454||
 plot_ni_prior_posterior_draws|stem|ed3133f6df71493f|0a78cf06a45cf3a0|2cb552272dd01048|-336509237||t20567.6568212821s|s47972492b|47972492|rds|local|vector|||11.172||
 plot_nv_prior_posterior_draws|stem|49cf3bfad6d3b923|0d3d48314a0722ee|632d2b3c509f5c9e|1666057334||t20567.6570411998s|s104455736b|104455736|rds|local|vector|||22.031||
 alt1_process_ni_group_preds|stem|44c4a7642a08cb8a|cf71c8ca66ce7810|a10975d9126afb24|1782712327||t20567.841275732s|s481322b|481322|rds|local|vector|||0.047||
-alt1_process_ni_group_measures|stem|b5645eda687358e0|f30f3440869ca802|7f6f5c4c8dbfbc17|-292049892||t20567.8414861427s|s4604b|4604|rds|local|vector|||0.5||
 process_ni_group_preds|stem|ceba0a6689e1a178|447148c894e47cc6|70bbfa93f7fc180d|-1385498220||t20567.8483296549s|s481236b|481236|rds|local|vector|||0.062||
-process_ni_group_measures|stem|52da4e6d8156e99a|24d00d5beedfce2b|3451b11f5958b030|1862476023||t20567.8485650551s|s4585b|4585|rds|local|vector|||0.515||
 process_ni_id_preds|stem|88f06c513b80b20b|a7ee75f5e5d28074|d2985aff1cd2362a|-284229536||t20567.854544974s|s3030428b|3030428|rds|local|vector|||0.187||
-get_ni_residuals|stem|1aa6912cc2651705|12babdc24525cc39|60ced2023dc69d54|788529792||t20567.8546021201s|s11624b|11624|rds|local|vector|||0.093||
 plot_ni_id_model|stem|fd0a57072a41eb19|dd71ed31e013166c|e9ba8dd972a31e83|1430226087||t20567.8547897758s|s44b|44|rds|local|vector|||20.922|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
 alt2_process_ni_group_preds|stem|4d13c2a4194f1342|3c268635f1460771|a123473db9eb8609|840967958||t20567.8701356765s|s481373b|481373|rds|local|vector|||0.031||
-alt2_process_ni_group_measures|stem|8832ac59f6eacd78|f588ca8e1875fb34|ecc64f1cea8a9321|-2062506747||t20567.8703142168s|s4583b|4583|rds|local|vector|||0.437||
 process_nv_group_preds|stem|5c8859089f27b338|0fe3af325aab9131|8e8fa92dcff13380|763918645||t20568.4599764407s|s1063576b|1063576|rds|local|vector|||0.094||
-process_nv_group_measures|stem|f74ecd0984aac9a6|e3a45e50fc75dcac|7bbd821da6078a0f|1444006478||t20568.4604167336s|s9377b|9377|rds|local|vector|||1.047||
-plot_gii4_pow_absolute_measures_vs_1year_draws|stem|be8b5f8b06301175|7010a2c1d69f7b90|c00f57e2b54ff657|1063443039||t20568.4605167363s|s15345969b|15345969|rds|local|vector|||3.218|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
-plot_measures_vs_1year_draws|stem|b7beca618fe02734|dabf0f881dce5500|c00f57e2b54ff657|1724875484||t20568.4605562702s|s26725056b|26725056|rds|local|vector|||4.421|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
-plot_pow_absolute_measures_vs_1year_draws|stem|6e71c0d265113c74|8e552ae35a5cd95e|c00f57e2b54ff657|-1299581507||t20568.4605609562s|s28738474b|28738474|rds|local|vector|||4.625|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
-plot_gii4_measures_vs_1year_draws|stem|0d65566c497fa293|58528fdf7c737271|c00f57e2b54ff657|-637962053||t20568.460586846s|s14532660b|14532660|rds|local|vector|||4.265|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
-plot_gii4_exp_measures_vs_1year_draws|stem|42792741447590c6|a461f950109b652a|c00f57e2b54ff657|-1108540338||t20568.460593973s|s13636439b|13636439|rds|local|vector|||4.438|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
-plot_exp_measures_vs_1year_draws|stem|35713508bccf88e0|17270ac81f57b1aa|c00f57e2b54ff657|-2040658100||t20568.4606156184s|s26916553b|26916553|rds|local|vector|||5.25|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
 process_nv_id_preds|stem|39bc568485c3a3f5|50987d6790b2c324|88d4f97fb4933e96|460035696||t20568.4844393039s|s10346815b|10346815|rds|local|vector|||0.704||
-get_nv_residuals|stem|3bc5a53bc2a7185f|a7fa18dc7a1e900f|29d2b147da674d0c|218054542||t20568.4844490447s|s61731b|61731|rds|local|vector|||0.235|Detected an unexpected many-to-many relationship between `x` and `y`. ℹ Row 1 of `x` matches multiple rows in `y`. ℹ Row 1249 of `y` matches multiple rows in `x`. ℹ If a many-to-many relationship is expected, set `relationship =   'many-to-many'` to silence this warning.|
 plot_nv_id_model|stem|fd0a57072a41eb19|863cfe79b43645e5|042259bad1f521ca|-1412908095||t20568.4854458413s|s44b|44|rds|local|vector|||85.656|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
 plot_nv_id_model_zoom|stem|fd0a57072a41eb19|3a73e43ccd697cc7|042259bad1f521ca|850373300||t20568.4857995336s|s44b|44|rds|local|vector|||97.015|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
 setup_model|stem|8982c4c49e9925c5|43d132d5ce0f77d7|d306e6db3b9ade00|409344896||t20568.8102185831s|s1190b|1190|rds|local|vector|||1.641||
 alt1_fit_ni_models|stem|4f17d04c1d12cc97|ca76f26b63a5b738|4dc0130ac07856b1|-1183613830||t20568.8377944599s|s63882794b|63882794|rds|local|vector|||2316.687||
 alt1_get_ni_model_metrics|stem|42060cf2c1f47fa5|f1b4f6122c2639cc|2ddbe48d8130df68|736999311||t20568.8379490238s|s323b|323|rds|local|vector|||12.344|Found 28 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 6 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 23 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 8 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 alt1_get_ni_group_preds|stem|e8ed41c72375aed2|e8ca0485690bb7f6|8170d198956312a8|-809942762||t20568.8391104176s|s537645673b|537645673|rds|local|vector|||58.344||
-alt1_get_ni_group_measures|stem|31e30502de3d10af|623319e566ea2809|2babf81440335329|1647967238||t20568.8393317732s|s11189436b|11189436|rds|local|vector|||12.406||
 fit_ni_models|stem|e3d566ad0bc694eb|fb7cc115a11ca163|a2760e82046664b5|1550743971||t20568.8417038307s|s63879669b|63879669|rds|local|vector|||2654.657||
 get_ni_model_metrics|stem|ee93b92d880615b3|c444a831f5b0e1ad|a854ef1b6e57b55e|729601525||t20568.8418425616s|s324b|324|rds|local|vector|||11.172|Found 30 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 9 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 2 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 23 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 14 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 4 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 get_ni_prior_posterior_draws|stem|91510fc7a871878b|1c64fb70d5df1cf6|d6eabed84c309ea4|-2000546308||t20568.8426491795s|s8945237b|8945237|rds|local|vector|||72.547|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
 get_ni_group_preds|stem|ba881e1cd5675f8c|2f9de5468b586676|6332e7cec9910ed5|274461735||t20568.8427257134s|s537723717b|537723717|rds|local|vector|||56.14||
-get_ni_group_measures|stem|6db3dd6058b61363|5ee786fd834e37c3|8257116591c4b50a|692018467||t20568.842924572s|s11194469b|11194469|rds|local|vector|||11.86||
 get_ni_id_preds|stem|5f0d3aad2cc55b9b|3fc1b8e58b8611d5|6332e7cec9910ed5|-1453779337||t20568.8489079216s|s3382071170b|3382071170|rds|local|vector|||401.25||
 alt2_fit_ni_models|stem|1cab49fa7a29177d|328d5c6e1f7fb0ae|4dc0130ac07856b1|-1430082972||t20568.8498944926s|s63889092b|63889092|rds|local|vector|||3362.203||
 alt2_get_ni_model_metrics|stem|a18f38432095d349|888d0266f3232926|c9d2c75d2f6b24aa|-891357507||t20568.8500256772s|s321b|321|rds|local|vector|||10.625|Found 30 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 15 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 2 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 20 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 21 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 4 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 alt2_get_ni_group_preds|stem|1d62bcb61819103c|41817651c413024e|08f690a2d128ff35|-77958205||t20568.8508447154s|s537732623b|537732623|rds|local|vector|||53.266||
-alt2_get_ni_group_measures|stem|24768ed60337116d|2f9946998ace508b|f2cdcaa8f9c1da75|108616261||t20568.8510151866s|s11199607b|11199607|rds|local|vector|||9.89||
 alt1_fit_nv_models|stem|c304a6a78eaaf168|2e1736c2973e164c|8ca3e267a3a730db|1397371513||t20568.9317423609s|s206476329b|206476329|rds|local|vector|||10427.765||
 alt1_get_nv_model_metrics|stem|c7c1093b80a8eda7|83a715d1dd9ef297|a231104bd5c69477|726498215||t20568.9323494847s|s399b|399|rds|local|vector|||50.641|Found 14 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 6 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 23 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 6 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 6 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 9 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 1 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 20 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 12 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 fit_nv_models|stem|bda786e779eacbef|e28ef523ef033d27|6db0796329f4ef19|-968612625||t20568.9337651918s|s206463953b|206463953|rds|local|vector|||10604.25||
 alt1_get_nv_group_preds|stem|7a5cff3e2557241d|6d105afc838e5183|d200e71bf913f335|1888807369||t20568.9341256655s|s1188388622b|1188388622|rds|local|vector|||115.422||
 alt1_process_nv_group_preds|stem|a5c5e7ed9b3579f8|3f6c2bdef83a74be|d5fba6ba1c09de1c|1674336087||t20568.9342256722s|s1062312b|1062312|rds|local|vector|||0.078||
-alt1_get_nv_group_measures|stem|7f905c0d684b151d|455b0792bcea327b|c876f4f36c2292f6|-1819088402||t20569.6284421915s|s24887129b|24887129|rds|local|vector|||24.781||
-alt1_process_nv_group_measures|stem|2d8ba42616c45b32|0f13aca461b78dad|671aff982641249c|672432734||t20569.6284578581s|s9361b|9361|rds|local|vector|||0.75||
 get_nv_model_metrics|stem|f8cc9dce3162c383|5244d6cf1388eacb|edd5b0f3281a51f6|-1764260090||t20569.6286777896s|s399b|399|rds|local|vector|||56.657|Found 14 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 17 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 30 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 8 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 12 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 13 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 1 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 24 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 9 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 get_nv_prior_posterior_draws|stem|308a627c8c39b1bd|b10819d5dda022d7|62aa40fe0e6be16f|-1278336761||t20569.6297959386s|s19946804b|19946804|rds|local|vector|||150.671|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
 get_nv_group_preds|stem|c28b454fdd14bbc4|05f835d6016e9615|3f7b185bea85ac26|1348489075||t20569.6304961675s|s1189279079b|1189279079|rds|local|vector|||125.954||
-get_nv_group_measures|stem|d23f675d480d5c43|fae74d07cc6bf663|ee8578dd9a861351|-1137785307||t20569.630906193s|s24931338b|24931338|rds|local|vector|||23.235||
 get_nv_id_preds|stem|33fb6b766e19e155|ae585ff77d2a1360|3f7b185bea85ac26|-332291692||t20569.6527666947s|s11565744858b|11565744858|rds|local|vector|||1295.281||
 alt2_fit_nv_models|stem|ab37014fc494cc4b|c22eaf2f88fb0e62|8ca3e267a3a730db|-1393483598||t20569.9542165331s|s206458944b|206458944|rds|local|vector|||28180.641||
 alt2_get_nv_model_metrics|stem|c7cadacc3c4c354e|dc4e09ba68cc9be3|ec147820dcdd5588|1934352661||t20569.954765686s|s400b|400|rds|local|vector|||45.813|Found 18 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 17 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 42 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 5 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 16 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 13 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 18 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 1 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 7 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
 alt2_get_nv_group_preds|stem|1297b2fc26bc6ac8|701908002501bae3|9008a52b0a17b027|1427265562||t20569.9564554257s|s1189532131b|1189532131|rds|local|vector|||109.453||
 alt2_process_nv_group_preds|stem|7754b7a94c8c6ca7|21fc591c3b9053ee|ed9aacc60fe6e71a|682822645||t20569.9565537084s|s1064090b|1064090|rds|local|vector|||0.047||
-alt2_get_nv_group_measures|stem|41e8c9276793fbdb|9ac7d1e2edfc4079|daff8031431076dc|-1301814822||t20569.9568207702s|s24940257b|24940257|rds|local|vector|||20.875||
-alt2_process_nv_group_measures|stem|49cfa7750d49e443|bfdb8cde3894ee45|909c331ce6e85f49|37687455||t20569.9568345303s|s9406b|9406|rds|local|vector|||0.672||
 plot_schematic|stem|3b5d2dbceca2a356|c4f997a17cd3714d|8b1ae5a341d2b631|-1713310195||t20570.636880215s|s1217854b|1217854|rds|local|vector|||1.359|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.. log-10 transformation introduced infinite values.|
-func_plot_comb_group_traj|function|5fd0b608bcc2350c
-plot_ni_group_model|stem|d275b904cb33576f|b414df5cbc97a987|81896a26caf60850|2087081364||t20574.6879042504s|s2574901b|2574901|rds|local|vector|||2.672|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-alt1_plot_ni_group_model|stem|52e52ac77bb03608|7730726b1ef8a662|e650db12e83609a4|-428032342||t20574.6879069285s|s2576523b|2576523|rds|local|vector|||2.609|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-alt2_plot_ni_group_model|stem|cee1088d990bd328|80a939f3a0321219|dab8c0502790d5d9|-1572996114||t20574.6879091253s|s2576531b|2576531|rds|local|vector|||2.641|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-plot_nv_group_model|stem|9cb79c409223c4ec|1f47a6bc61f86601|0f408d695f3edecf|-1012178762||t20574.6879155971s|s5019946b|5019946|rds|local|vector|||3.516|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-func_plot_pairwise_compare|function|9c3baafb1de4f35b
-func_fit_models|function|313d3c1ac93d2bcc
-func_get_preds|function|5d7fe7593714cd4c
-func_plot_id_model|function|8edd6a13a2236a0a
-func_tab_correlations|function|338d788bb4d4cffa
-func_get_prior_posterior_draws|function|090d3b7fc4279002
-func_process_draws|function|cf6e66519a7526f4
-func_plot_decay_rates|function|32ef78c7b55cb969
-func_setup_model|function|8b65c5f9f2aca5cc
-func_tab_model_metrics|function|770c158472b8f350
-func_process_preds|function|e4f92bac516bea18
-func_get_residuals|function|0fbf2e79c17bc102
-func_alt_process_nv_data|function|6bd12ea23aec272a
-func_pairwise_compare|function|6f0e5b90c3dc93d8
-func_figure_setup|function|f4c03c5474098b9e
-n_local_cores|object|a2f3981e584d6a95
-func_plot_comb_peak_decay_vs|function|140acdd97552482c
-func_plot_measures|function|9795f2ed874fb4b9
-func_plot_comb_group_peak_decay_1year_draws|function|54e0e093dc011bc0
-func_get_correlations|function|67641ab55ea8d573
-func_alt_process_ni_data|function|7ca520041fb1bf15
-func_plot_schematic|function|83154fb3f0274e51
-func_plot_absolute_measures|function|4975fc376f6058cb
-func_plot_group_peak_decay_draws|function|af1ef46bc51cce7a
-func_plot_group_model_traj|function|e961fea54f975d00
+func_plot_comb_group_traj|function|5fd0b608bcc2350c|||||||||||||||
+plot_nv_spagetti|stem|27e2c213e7baae60|a2a7cdaec008513f|f8c11f862b724c7c|1161486002||t20654.614299504s|s760126b|760126|rds|local|vector|||2.516||
+get_ni_model_metrics_prior_sens|stem|16855c906aaa2537|f7aee4aa51311ba3|7b4bca22ed352a3f|-440045427||t20654.8869252838s|s323b|323|rds|local|vector|||14.421|Found 26 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 13 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 2 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 24 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 13 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
+get_nv_model_metrics_prior_sens|stem|ecef93e90e7a1aa8|e9df84b00d34f3ec|cddf3f9a9bf49205|255711084||t20655.1796199768s|s398b|398|rds|local|vector|||50.016|Found 10 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 12 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 32 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 11 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 17 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 12 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 2 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 20 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 1 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 7 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
+ni_main|object|2728e91b51cb41e3|||||||||||||||
+func_plot_spagetti|function|5886100d651212c5|||||||||||||||
+plot_ni_spagetti|stem|d9c8ff4ddb03aab5|ba885f9e8dfb004c|966798d896852d5e|-801476493||t20654.6142963547s||613697|rds|local|vector|||0||could not find function 'func_plot_spagetti'
+plot_ni_spaghetti|stem|7fd710b3095aeeb0|285be6281f8f0277|793f3bd5ac19ec98|1576741255||t20655.8412148536s|s621950b|621950|rds|local|vector|||4.562||
+plot_nv_spaghetti|stem|5b182564f67f6b51|4956707364484178|cbd12aee985402c6|1844423050||t20655.8412181985s|s768529b|768529|rds|local|vector|||4.688||
+nv_second_dose|stem||84287464338a3f79|2ae2b2ebaa67b791|-1606566291||t20656.697731294s||0|rds|local|vector|||0||could not find function 'func_nv_second_dose'
+plot_ni_group_model|stem|2c746ba9fbfed72b|b414df5cbc97a987|81896a26caf60850|2087081364||t20656.8616459759s|s2590560b|2590560|rds|local|vector|||1.609|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+alt1_plot_ni_group_model|stem|3605e7a28158c738|7730726b1ef8a662|e650db12e83609a4|-428032342||t20656.8616529657s|s2592024b|2592024|rds|local|vector|||1.75|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+alt2_plot_ni_group_model|stem|f0016fa92e96b263|80a939f3a0321219|dab8c0502790d5d9|-1572996114||t20656.8616562743s|s2592348b|2592348|rds|local|vector|||1.765|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+plot_nv_group_model|stem|57d4797eb21ae0ec|1f47a6bc61f86601|0f408d695f3edecf|-1012178762||t20656.8616577368s|s5033306b|5033306|rds|local|vector|||2.219|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+alt2_plot_nv_group_model|stem|343a835c9c0c5633|468280b535524b9e|9fddf080f8d5b586|1905615057||t20656.8616661993s|s5036001b|5036001|rds|local|vector|||2.328|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+alt1_plot_nv_group_model|stem|2b6227aafa663c24|163cbd22965cec4a|cf38cfa3a2a11e71|1406534520||t20656.8616683611s|s5030236b|5030236|rds|local|vector|||2.375|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+plot_comb_group_model|stem|99e24ec308e7ebc3|77459b38bedee4f7|8070759eed9d919e|1278987446||t20656.8616906681s|s167b|167|rds|local|vector|||2.375||
+setup_model_prior_k_sens|stem|9fe1612ebe2e25eb|3ff9305a6346f7ec|9b72f21dccd71784|1229905192||t20661.7681578001s|s1191b|1191|rds|local|vector|||1.703||
+fit_nv_models_prior_k_sens|stem|092cbca25d8e3876|0ea3d3fd2cf6d48c|2296739a987863a6|492430280||t20661.8771217302s|s206446619b|206446619|rds|local|vector|||9403.953||
+get_nv_prior_posterior_draws_prior_k_sens|stem|6a89c09b3331230f|8961aec183b8134c|a960f55576947254|-1404429981||t20661.879421594s|s19922366b|19922366|rds|local|vector|||167.703|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
+get_nv_group_preds_prior_k_sens|stem|b5ea9385f566e5ec|7a04b4d6bae4adc9|f2ef1a35d1aa413d|-2006332096||t20661.8799571719s|s1189430013b|1189430013|rds|local|vector|||150.5||
+get_nv_group_measures_prior_k_sens|stem|634d36606af5b196|1a4579a0981a8472|c113a308e3d456f9|1933932869||t20661.8804444574s|s24906267b|24906267|rds|local|vector|||28.828||
+process_nv_group_measures_prior_k_sens|stem|67de5f71ed70c294|7aa458b9c307f817|65838f3894e7220e|-1159083950||t20661.8804646683s|s9398b|9398|rds|local|vector|||0.953||
+plot_nv_pow_measures_prior_k_sens|stem|304d6373e0e79d9b|c7f8c1dea5a54174|7473de9a0be38c5b|-366182383||t20661.8805579372s|s713225b|713225|rds|local|vector|||7.5|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_ni_group_model_linear|stem|2e5c0cd91e84612e|0439ff0187719e81|dce82ba9e8cdd398|-1677824660||t20661.8915012047s|s2612226b|2612226|rds|local|vector|||5.172|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+plot_nv_group_model_linear|stem|0b76047b152f2d08|4ebcc95d2cdbcdb6|c9171a3e26ccafbc|750801697||t20661.8915089013s|s4967262b|4967262|rds|local|vector|||6.203|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+plot_nv_prior_posterior_draws_prior_k_sens|stem|0003e9cdeabc6b75|fbfb3cbd81a054b5|5eed93ea60cb28db|-774681993||t20661.8931147769s|s104327200b|104327200|rds|local|vector|||21.187||
+tab_nv_percent_loss|stem|fd0a57072a41eb19|78891d4bcd314a01|bf7f4462bec40027|301661091||t20662.0090456631s|s44b|44|rds|local|vector|||0.922||
+tab_ni_percent_loss|stem|fd0a57072a41eb19|5b57ce2db744a680|fd1cdf9244d4305c|-1958451390||t20662.0090478245s|s44b|44|rds|local|vector|||0.921||
+tab_ni_iga_igg|stem|fd0a57072a41eb19|b8e57d06fc85edf1|9030dd5cb684f3a4|2066297507||t20662.0518384366s|s44b|44|rds|local|vector|||3.703||
+tab_nv_iga_igg|stem|fd0a57072a41eb19|2f4a48cef88791bf|c323d4f83a5b898c|-1878034826||t20662.0518430693s|s44b|44|rds|local|vector|||3.766||
+tab_ni_model_diagnostics|stem|fd0a57072a41eb19|3df109847297e5a4|0aff3bf7beb27520|-228145535||t20662.7893874011s|s44b|44|rds|local|vector|||9.828||
+tab_nv_model_diagnostics|stem|fd0a57072a41eb19|cdb103a599709f1c|cdd0854620e8b7ed|-133048044||t20662.7894251389s|s44b|44|rds|local|vector|||11.938||
+func_setup_model_prior_k_sens|function|4e408bd5a52b6132
+plot_ni_trace|stem|00ac3b3af3ddbb08|faa96f0dca91870d|6e65135fe0767a39|192439795||t20662.8332995017s|s78693187b|78693187|rds|local|vector|||22.657|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
+plot_nv_trace|stem|8e2243c7b013ea8e|31c6593094cf4b28|7dd02a7202143f55|-2001352402||t20662.83348508s|s234412861b|234412861|rds|local|vector|||31.468|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
+setup_model_prior_sens|stem|98fac20d8c8a97e1|a20a8649e5b8209b|62303a7708f5d910|-594327128||t20662.9317833703s|s1189b|1189|rds|local|vector|||2.172||
+fit_ni_models_prior_sens|stem|0870643d20eaf247|cb62c95a8c3ae554|15ad1bd4a6f3c22e|205829752||t20663.0168691905s|s63887495b|63887495|rds|local|vector|||2359.969||
+get_ni_group_preds_prior_sens|stem|ea14b016f5ed21df|52b7c86f52af5ba6|4b92e8d561745faa|1707367625||t20663.0179861394s|s537779005b|537779005|rds|local|vector|||63.406||
+get_ni_prior_posterior_draws_prior_sens|stem|4e479f712761df7b|1022617096355377|684361488881b82f|-1992287491||t20663.0180778262s|s8935709b|8935709|rds|local|vector|||78.812|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
+plot_ni_prior_posterior_draws_prior_sens|stem|9da7642b82a89963|52616799d3e80c2a|e60f2674300025f4|198866937||t20663.0186537847s|s95018003b|95018003|rds|local|vector|||25.25||
+fit_nv_models_prior_sens|stem|5bcd8d62f34b3cb3|3f11b19db86e54bb|ffd28bc6ec0a5f50|-1616451676||t20663.2681273439s|s206216234b|206216234|rds|local|vector|||21308.421||
+get_nv_prior_posterior_draws_prior_sens|stem|d6142dd3f0fcd012|84e81013a5e27577|06c6db728e928580|-1429894580||t20663.2698790908s|s19908543b|19908543|rds|local|vector|||146.625|Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.. Dropping 'draws_df' class as required metadata was removed.|
+get_nv_group_preds_prior_sens|stem|d2b7bfb8eabcb38f|2190f2320e9e22f8|8ec5e31460849a32|-1302695427||t20663.270691386s|s1187743862b|1187743862|rds|local|vector|||121.36||
+plot_nv_prior_posterior_draws_prior_sens|stem|d50f106ff59a7359|2be35e97e832978d|6eab9d6c4d8454a2|-1105340650||t20663.2709926058s|s207711271b|207711271|rds|local|vector|||40.203||
+setup_model_flexible|stem|fe92454d64bb2845|3c40f6e4bab458c9|2be45d8c0fab1b15|1623075576||t20663.6852272433s|s1098b|1098|rds|local|vector|||1.719||
+fit_ni_models_flexible|stem|589f1b8baa628b37|1a05dc89900ba0f1|fff4c3805a1c214b|825458632||t20663.7051615493s|s32713836b|32713836|rds|local|vector|||1649.641||
+fit_nv_models_flexible|stem|ab92df56f18baa0a|06f2f859043b04c5|78e619dd4619b6e1|199077988||t20663.8252895302s|s104700577b|104700577|rds|local|vector|||9092.718||
+nv|object|ed5a2e50b5e58354
+nv_flex|object|0d12ed10867562b1
+ni_flex|object|ee40bf46d14a753b
+ni|object|10395f1bb93b0e0a
+get_ni_model_metrics_flexible|stem|1aef4e0b9cb6ea08|8f1aba939fe68ee3|93cc5f2a6548923b|-1414626124||t20663.871083304s|s332b|332|rds|local|vector|||14.766|Found 23 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 14 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 4 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 21 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 20 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
+get_nv_model_metrics_flexible|stem|efa85589346434dd|1e5e13b89b2d0689|52b5670b9b9e1fd5|30021694||t20663.8715134913s|s414b|414|rds|local|vector|||50.187|Found 13 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 1 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 24 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 3 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 9 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 10 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 4 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 23 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations. . Found 10 observations with a pareto_k > 0.7 in model 'X[[i]]'. We recommend to set 'moment_match = TRUE' in order to perform moment matching for problematic observations.|
+get_ni_group_preds_flexible|stem|ab977ac26fbe2887|18bbc4234c5ddd72|d11137d165902adc|-901144895||t20663.8748165995s|s268679440b|268679440|rds|local|vector|||35.391||
+get_nv_group_preds_flexible|stem|99e842b6f6c69c13|5efb345b48d82aee|7d8d65cc2ae4abe2|-1185022925||t20663.8754613928s|s595056537b|595056537|rds|local|vector|||71.719||
+process_ni_group_preds_flexible|stem|0ef0e238017e407e|7385f8865295f2da|e395e9113543a9c4|-102557379||t20663.875928256s|s241045b|241045|rds|local|vector|||0.063||
+process_nv_group_preds_flexible|stem|0fa91172920a4acf|9a3ca7dd06d975e9|d5dcc2bc74154c25|-27355664||t20663.875963819s|s534078b|534078|rds|local|vector|||0.062||
+plot_ni_group_model_flexible|stem|5fb4fa6208db4b0e|4f12083d8d47f4e1|760822f1ad337cec|-566285083||t20663.884384135s|s3089521b|3089521|rds|local|vector|||2.312|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+plot_nv_group_model_flexible|stem|e4dfbf4cc4cc6495|080f79147f94a601|822ac2fc4e395fba|1809528452||t20663.8843937003s|s6130978b|6130978|rds|local|vector|||2.985|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
+get_ni_group_measures_flexible|stem|81fabbea51d45da4|285ba5307e5bfaaa|c8751e22f9c469a9|-874248791||t20665.7998596985s|s6122077b|6122077|rds|local|vector|||18.047||
+process_ni_group_measures_flexible|stem|75b0215f814faa93|6929380e28d341b7|cfeab6a603a8ff99|849045597||t20665.7998682843s|s2913b|2913|rds|local|vector|||0.359||
+plot_ni_pow_measures_flexible|stem|5529375fe06d57f8|43a0cd8e72232262|866c8df4c923d139|672393954||t20665.799910925s|s726864b|726864|rds|local|vector|||2.984|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+get_ni_group_measures|stem|5a4e6a506be7d3c0|5ee786fd834e37c3|762b8c25a52b3539|692018467||t20665.8000994008s|s12280244b|12280244|rds|local|vector|||35.735||
+get_ni_group_measures_prior_sens|stem|a30138a9412434bf|e5d28b16a13a99d0|ee7c9258e6fbd879|1929790937||t20665.8001078978s|s12290476b|12290476|rds|local|vector|||35.656||
+process_ni_group_measures|stem|7789013964a9384d|40abcf510f9babc1|787b06f90d3a3330|1862476023||t20665.8001125152s|s5026b|5026|rds|local|vector|||0.625||
+process_ni_group_measures_prior_sens|stem|a5fd3cf0043e4fea|4bd6ed1881448e35|4076209497f980b5|-1533766949||t20665.8001215915s|s5047b|5047|rds|local|vector|||0.641||
+alt2_get_ni_group_measures|stem|d10ae91ca0ab1aae|2f9946998ace508b|bb1ee76b511226ac|108616261||t20665.8001272202s|s12283862b|12283862|rds|local|vector|||35.282||
+alt1_get_ni_group_measures|stem|c2f5efc1f9c970d9|623319e566ea2809|047eb35fba919fc0|1647967238||t20665.8001273584s|s12279101b|12279101|rds|local|vector|||35.328||
+process_ni_group_draws|stem|7514713a58ef2496|58638bc06ddd2d16|dcde6abd29e635a4|-829789670||t20665.8001316186s|s11596421b|11596421|rds|local|vector|||0.516||
+plot_ni_exp_measures|stem|995ee971f5c5b533|952e509546c70bf9|a574fe006d567b30|-635489814||t20665.8001493916s|s729488b|729488|rds|local|vector|||2.531|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_ni_pow_measures_auc|stem|4e85530bb65ae993|9cf416d090d3f573|f49675259f44c953|510829724||t20665.8001548547s|s711084b|711084|rds|local|vector|||2.313|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+get_nv_group_measures_flexible|stem|9a9652693400d78d|75a64c3f5baba980|a56f9ee105b189d7|-2095198858||t20665.8001577072s|s13625208b|13625208|rds|local|vector|||37.891||
+plot_ni_decay_rates|stem|feae52bdb442dee3|50badecad13aab4c|f1d594485956421b|1630319924||t20665.8001581704s|s640445b|640445|rds|local|vector|||2.187|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_ni_pow_absolute_measures|stem|6bd140d0404ecd54|c34b63e902dc1b90|4d052e3710ea8f82|-1320637983||t20665.8001633532s|s720042b|720042|rds|local|vector|||2.531|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_ni_pow_measures|stem|ccdeeba3e8dbbcb0|00ac84cb615309f4|a574fe006d567b30|923641155||t20665.8001659236s|s729466b|729466|rds|local|vector|||2.359||
+alt2_process_ni_group_measures|stem|ba4a42fdbdd159a6|ac0fbc92615b8155|5c9838dcbe893868|-2062506747||t20665.8001668477s|s5027b|5027|rds|local|vector|||0.594||
+alt1_process_ni_group_measures|stem|a6a8ca3244384fc2|0f852c7c94db0d5c|bf19ba4720646e4d|-292049892||t20665.8001689083s|s5046b|5046|rds|local|vector|||0.578||
+process_nv_group_measures_flexible|stem|0c6d4feed707b36d|077e835af3ed6c30|3ca714ed60d30483|-1760916403||t20665.8001723275s|s5875b|5875|rds|local|vector|||0.718||
+plot_ni_pow_measures_prior_sens|stem|6f48723677e3aa21|3c292c746012ba6b|5b60b3219b9c035b|-165984483||t20665.800180887s|s729506b|729506|rds|local|vector|||2.14||
+alt2_plot_ni_pow_measures|stem|3c1d776d0c2a2c3f|12dcec148817351c|754f6b1d9475e2f7|-1919396998||t20665.8001991417s|s729476b|729476|rds|local|vector|||2.203||
+alt1_plot_ni_pow_measures|stem|99c97004f3a8afc2|b77b22b363695553|9e0e9080d955d97d|1602519536||t20665.8002008287s|s729514b|729514|rds|local|vector|||2.156||
+plot_nv_pow_measures_flexible|stem|7c36a71a1791bb34|74bdb95a310c31a0|e8fd27f9235e5dcf|268233988||t20665.8002195635s|s733173b|733173|rds|local|vector|||3.5||
+get_nv_group_measures|stem|4508e278f968d686|fae74d07cc6bf663|3092a2ee28cec7ee|-1137785307||t20665.8006053397s|s27341521b|27341521|rds|local|vector|||68.718||
+alt2_get_nv_group_measures|stem|ba438e0bb3f22967|9ac7d1e2edfc4079|c51ecd0771345c1e|-1301814822||t20665.8006061102s|s27356546b|27356546|rds|local|vector|||67.938||
+get_nv_group_measures_prior_sens|stem|18d102e62bf7defc|a0bc414a7e508f3e|193bf082287f30f6|389997695||t20665.8006219423s|s27334633b|27334633|rds|local|vector|||70.719||
+process_nv_group_measures|stem|608ba864815cb1b6|13ed43d971ce5435|3d4d3c8c2293c30a|1444006478||t20665.8006281698s|s10343b|10343|rds|local|vector|||1.109||
+alt2_process_nv_group_measures|stem|2e65b64750a403fd|4534816f974098f0|f74264ce4bc18547|37687455||t20665.800637889s|s10360b|10360|rds|local|vector|||1.328||
+alt1_get_nv_group_measures|stem|6cf0eefded549597|455b0792bcea327b|0de6495bf19c4306|-1819088402||t20665.8006453061s|s27294175b|27294175|rds|local|vector|||70.875||
+process_nv_group_measures_prior_sens|stem|728a5fb7d46e27f4|ff594a85a8e94cf1|ae974fe79765459a|263015535||t20665.8006518599s|s10317b|10317|rds|local|vector|||1.39||
+plot_nv_pow_measures|stem|19f7034db57611ba|d8b2218bf70f481c|c54c3e10eb9fdfcf|1824901199||t20665.800666268s|s739990b|739990|rds|local|vector|||2.672||
+plot_nv_pow_absolute_measures|stem|331cb38f6fcfdf5b|cf20c62c0f30b3d1|4865727d6f58bff0|102593818||t20665.8006679127s|s740878b|740878|rds|local|vector|||2.719||
+alt1_process_nv_group_measures|stem|5311678f670d71b4|06ee31e51adc1ddf|96574936f00814d9|672432734||t20665.8006700387s|s10330b|10330|rds|local|vector|||1.203||
+plot_nv_decay_rates|stem|eb61fd52874da2bc|a60596ac64835da3|b319972fc94c0cac|1528255470||t20665.8006728411s|s650282b|650282|rds|local|vector|||3.203|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+process_nv_group_draws|stem|dac3ac20799a50b7|f001c3a2d37cec12|e06d72982bd93a8d|59988835||t20665.8006749258s|s25730691b|25730691|rds|local|vector|||1.375||
+plot_nv_pow_measures_auc|stem|b82e6447ba57d7dc|e149eb11be7502d6|a1975193a2cdd7ec|-784020001||t20665.8006832836s|s731247b|731247|rds|local|vector|||3.531|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_nv_exp_measures|stem|0f2e7b8cff8a6dbf|b87f269ca9c1ecb9|c54c3e10eb9fdfcf|786740560||t20665.8006898566s|s740020b|740020|rds|local|vector|||4.188|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+alt2_plot_nv_pow_measures|stem|70961a7a96d10045|920a28348e379934|6a63178dfb964532|-234989958||t20665.8006912468s|s740074b|740074|rds|local|vector|||3.969|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+plot_nv_pow_measures_prior_sens|stem|5c7d0625a748b9ef|1dae2b09c3b3bf94|fc4eac61d9f85d1b|376786381||t20665.8007067526s|s739989b|739989|rds|local|vector|||4.141|The `fatten` argument of `geom_pointrange()` is deprecated as of ggplot2 4.0.0. ℹ Please use the `size` aesthetic instead.|
+alt1_plot_nv_pow_measures|stem|b0303a350460cb29|7fb2937c6092d84b|33fdc78d8157f2db|1890822884||t20665.8007099247s|s740038b|740038|rds|local|vector|||2.812||
+plot_gii4_pow_group_peak_decay_1year_draws|stem|0f474a319987e9b4|8bb5d6189b40dc3c|f8121e37919cfb66|1752455499||t20665.80073539s|s10278214b|10278214|rds|local|vector|||0.719||
+plot_gii4_pow_group_peak_decay_draws|stem|e44b6ab9e0025024|772460dfdde3b12a|52b2994c9134811d|-1704916211||t20665.8007477714s|s11586762b|11586762|rds|local|vector|||0.485||
+plot_exp_group_peak_decay_1year_draws|stem|01970fbafd89abed|89320171d6a372b4|f8121e37919cfb66|-1590659838||t20665.8007495903s|s15593924b|15593924|rds|local|vector|||0.782||
+plot_gii4_exp_group_peak_decay_1year_draws|stem|b9add060a59559c8|d6e41ab5d28e6052|f8121e37919cfb66|-1862021032||t20665.800766039s|s9677978b|9677978|rds|local|vector|||0.578||
+plot_pow_group_peak_decay365_1year_draws|stem|3a994e63cd9ca10c|cf266a35c78f6a7a|f8121e37919cfb66|1179435250||t20665.8007707311s|s16869865b|16869865|rds|local|vector|||0.704||
+plot_pow_group_peak_decay_draws|stem|b03b18b238b631af|a37180468145fb30|52b2994c9134811d|403304980||t20665.800773691s|s18794050b|18794050|rds|local|vector|||0.656||
+plot_pow_absolute_group_peak_decay_1year_draws|stem|2391940feecf253e|2aa4225ebdfb858b|f8121e37919cfb66|1271228194||t20665.8007740887s|s16876089b|16876089|rds|local|vector|||0.657||
+plot_pow_absolute_group_peak_decay_draws|stem|2abf6b90b53852f8|619b3bdcc0017277|52b2994c9134811d|1033887037||t20665.8007745608s|s18793253b|18793253|rds|local|vector|||0.797||
+plot_gii4_pow_absolute_group_peak_decay_draws|stem|ef407d1e85cd717b|1f403a2df708e8ab|52b2994c9134811d|-839324550||t20665.800785689s|s11593581b|11593581|rds|local|vector|||0.359||
+plot_gii4_pow_absolute_measures_vs_1year_draws|stem|9030920de372ca6c|7010a2c1d69f7b90|143f89093b8dfb7a|1063443039||t20665.8007934879s|s15383786b|15383786|rds|local|vector|||4.312|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_pow_group_peak_decay_1year_draws|stem|7d37c3dbbe508fcb|5154ba5b71d321ae|f8121e37919cfb66|-133777194||t20665.8007883248s|s16860517b|16860517|rds|local|vector|||0.656||
+plot_gii4_exp_group_peak_decay_draws|stem|499947a06e764ce3|9e543fdbe67c0233|52b2994c9134811d|1343966323||t20665.8008545775s|s10950262b|10950262|rds|local|vector|||1.297||
+plot_exp_group_peak_decay_draws|stem|8e052ec9592ec1bb|1174324c626ac70a|52b2994c9134811d|489416235||t20665.8008775232s|s17507087b|17507087|rds|local|vector|||1.422||
+plot_gii4_pow_comb_peak_decay_vs|stem|820f80315533b135|2337a53ee258406e|69b912d1af142453|892064640||t20665.8008990575s|s182b|182|rds|local|vector|||2.969||
+plot_pow_group_peak_decay60_1year_draws|stem|b0242bf4d9236a9c|6f720353c5d7bc8a|f8121e37919cfb66|1969659228||t20665.8009083724s|s16869721b|16869721|rds|local|vector|||1.735||
+plot_gii4_pow_absolute_group_peak_decay_1year_draws|stem|d80a5cd9035d46ca|9330017c6414b20d|f8121e37919cfb66|1482036068||t20665.8009113177s|s10291310b|10291310|rds|local|vector|||0.422||
+plot_pow_absolute_comb_peak_decay_vs|stem|bf949ad8783a2cab|f435927af59f6057|41a7373df8f1a39d|265282835||t20665.8009312693s|s178b|178|rds|local|vector|||3.86||
+plot_gii4_exp_measures_vs_1year_draws|stem|4cfc7a01f8878840|a461f950109b652a|143f89093b8dfb7a|-1108540338||t20665.8009333352s|s13684928b|13684928|rds|local|vector|||4.75|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_pow_comb_peak_decay_vs|stem|72d8378d3c487d5b|317de0e09d94efeb|025c0951bda48a99|-206038097||t20665.800937081s|s164b|164|rds|local|vector|||4.172||
+plot_gii4_measures_vs_1year_draws|stem|cfa4c2f57aef1032|58528fdf7c737271|143f89093b8dfb7a|-637962053||t20665.8009381206s|s14572547b|14572547|rds|local|vector|||4.828|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_pow_group_peak_decay180_1year_draws|stem|308cfacb05f24932|79849968a60daeea|f8121e37919cfb66|-667252716||t20665.8009496946s|s16869656b|16869656|rds|local|vector|||0.531||
+plot_gii4_exp_comb_peak_decay_vs|stem|d4b551cd11ab4383|c26ce722811e8467|8cb687795f04b3c5|1283134026||t20665.8009674592s|s195b|195|rds|local|vector|||3||
+plot_exp_measures_vs_1year_draws|stem|06c04e09faddc667|17270ac81f57b1aa|143f89093b8dfb7a|-2040658100||t20665.8009696217s|s26955142b|26955142|rds|local|vector|||5.5|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_measures_vs_1year_draws|stem|5d2d8ed0f2107953|dabf0f881dce5500|143f89093b8dfb7a|1724875484||t20665.8009709924s|s26769421b|26769421|rds|local|vector|||5.735|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_gii4_pow_absolute_comb_peak_decay_vs|stem|e70b436d3fc3bdda|64da4fded37b46db|752bf3119b500e60|-1492065820||t20665.8009780537s|s189b|189|rds|local|vector|||2.735|Removed 48 rows containing missing values or values outside the scale range (`geom_point()`).. Removed 48 rows containing missing values or values outside the scale range (`geom_point()`).|
+plot_pow_absolute_measures_vs_1year_draws|stem|3e3d89ee9de9285e|8e552ae35a5cd95e|143f89093b8dfb7a|-1299581507||t20665.8009787461s|s28807235b|28807235|rds|local|vector|||5.907|Using an external vector in selections was deprecated in tidyselect 1.1.0. ℹ Please use `all_of()` or `any_of()` instead.   # Was:   data %>% select(x_measure)    # Now:   data %>% select(all_of(x_measure))  See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.|
+plot_exp_comb_peak_decay_vs|stem|bff3d5a0a1819bee|58c6f39c1d6ec049|1004c3fde9631cb7|132218618||t20665.8010053632s|s186b|186|rds|local|vector|||4.219||
+plot_comb_pow_group_peak_decay_1year_draws|stem|bc63a03a5f60cf00|9cecafae1764b2a1|c69ad9486f96a2bc|1873303218||t20665.8010675168s|s166b|166|rds|local|vector|||4.25||
+plot_ni_pairwise|stem|fd0a57072a41eb19|99d00a0077d23a19|857f1c5ecddd6fa8|1699695645||t20668.6579003933s|s44b|44|rds|local|vector|||106.39||
+plot_nv_pairwise|stem|fd0a57072a41eb19|4f5e5b9b6560008b|c2352784f7ce2b86|439800325||t20668.6589651001s|s44b|44|rds|local|vector|||196.485||
+plot_ni_random_effects|stem|fd0a57072a41eb19|a74ec66d789c7028|be8294881777b5d2|-1194643693||t20668.6958086028s|s44b|44|rds|local|vector|||8.375||
+plot_nv_random_effects|stem|fd0a57072a41eb19|76b1c23495a22afb|ec548f575454d908|2121156960||t20668.6968641008s|s44b|44|rds|local|vector|||8.219||
+tab_ni_random_effect_sd|stem|fd0a57072a41eb19|b2702bd0665e739b|bb345b944db984bd|-1873072307||t20668.7766589876s|s44b|44|rds|local|vector|||2.656||
+tab_nv_random_effect_sd|stem|fd0a57072a41eb19|646efc856975f33e|b8638e4f03fb54f8|-1980336091||t20668.7783329235s|s44b|44|rds|local|vector|||4.25||
+tab_n_ni_cens_obs|stem|a1ee7b4d14a520c8|497e7eb68a33853e|1d4702b372fb4ed1|-1508569104||t20669.8415144065s|s37712b|37712|rds|local|vector|||16.235||
+tab_n_nv_cens_obs|stem|3fca5ae6ce810dee|490ea38b3e90dcb1|77917cf9937b4243|-472621914||t20669.8416564386s|s89343b|89343|rds|local|vector|||28.61||
+df|object|a803cbae9220b7e7
+models|object|10395f1bb93b0e0a
+draws|object|dfafdd774a930431
+tab_split|object|dcad5463283b74b8
+sd_pars|object|a9b0395b1ebcedea
+title|object|e9fd3c8567576d05
+tab|object|ccd30e417ae65f34
+m|object|46f0f5ead1f0aede
+bind|object|54747a67aea110b6
+dat|object|50ccd4458ce7c2df
+t|object|61235e97e9e2182e
+results|object|150983c323bc9e2a
+fit|object|767284cb7a5a1bbc
+tab_ni_dose_median_iqr|stem|fd0a57072a41eb19|4d5e9d6c191facc9|042059ce25bf0f32|-624864270||t20670.6829594562s|s44b|44|rds|local|vector|||2.047||
+tab_nv_dose_median_iqr|stem|fd0a57072a41eb19|d24d7458de81864d|6ef131cdcd62cbd3|-1297353522||t20670.682961264s|s44b|44|rds|local|vector|||2.625||
+func_setup_model_flatten|function|1384862455170c2b
+tab_correlations_overall|stem|c8baf4c226a84627|3dcca49f0ecdd8cb|cc72496a3e46540f|836038761||t20670.7107344842s|s162b|162|rds|local|vector|||7.875||
+tab_prior_sens|stem|fd0a57072a41eb19|3158ed499b48ba7c|36e38a1021d4c0e1|-401749831||t20670.7107648225s|s44b|44|rds|local|vector|||10.844||
+tab_correlations_dose|stem|fd0a57072a41eb19|154963235b08049b|8fd373529c687424|-973187463||t20670.7108086957s|s44b|44|rds|local|vector|||14.641||
+tab_nv_second_dose|stem|fd0a57072a41eb19|6f59e6a407f45fa0|73da469cd7fc1bd1|248149159||t20670.7108208744s|s44b|44|rds|local|vector|||15.844||
 func_plot_fitted_vs_observed|function|36da0a0b724582c3
-func_process_measures|function|0c5962ab2dcb1806
-func_process_nv_data|function|1cf7fa2caa050d47
-func_get_measures_group|function|ea765941e1b8656a
-controller_local|object|5222b52c728e56d8
-func_process_ni_data|function|1cf7fa2caa050d47
+reproduce_manuscript|stem|37476fbe672e33ad|c24ac64c28a6af32|cd795ef326f65afb|-660736331||t20672.6857352639s|s28200347b|28200347|rds|local|vector|||0||
+get_nv_obs_measures|stem|e357494a5b1edb8b|9c553e1501eef9aa|3b64800c2c1e5a17|-1710507832||t20679.6704121347s|s8427b|8427|rds|local|vector|||0.109||
+get_ni_obs_measures|stem|5265b808ac0e3454|7adafa61115c89e1|799277be1f2181fd|-849943196||t20679.6704167536s|s3353b|3353|rds|local|vector|||0.078||
+get_ni_residuals|stem|3e7771ba2a263cf5|12babdc24525cc39|6fe90fa060e06513|788529792||t20679.6716903222s|s21984b|21984|rds|local|vector|||0.094||
+get_nv_residuals|stem|8b0b7601b04c4b71|a7fa18dc7a1e900f|a14fc1a5e2a4755d|218054542||t20679.6716916861s|s119025b|119025|rds|local|vector|||0.187|Detected an unexpected many-to-many relationship between `x` and `y`. ℹ Row 1 of `x` matches multiple rows in `y`. ℹ Row 1249 of `y` matches multiple rows in `x`. ℹ If a many-to-many relationship is expected, set `relationship =   'many-to-many'` to silence this warning.|
+.Random.seed|object|a7c3411ca86b8f17
+func_tab_random_effect_sd|function|04dbfd1ee44fed11
 func_plot_comb_group_model_traj|function|4279d554daa12ce0
-func_get_model_metrics|function|d884c3b9f3a827be
-func_tab_n_cens|function|963c8b18e878ea1c
-func_plot_measures_vs_1year_draws|function|07a3e90e8cc0a107
 func_plot_prior_posterior_draws|function|fb9f67ba28c7d68b
+func_process_measures|function|88c5e8662dfe184e
+n_local_cores|object|a2f3981e584d6a95
+func_plot_spaghetti|function|5886100d651212c5
+func_tab_n_cens|function|e6b5bec89eb9acd1
+func_plot_decay_rates|function|32ef78c7b55cb969
 func_plot_group_peak_decay_1year_draws|function|b94a0077386b09fa
-alt2_plot_nv_group_model|stem|0f55dd3b8e7cae68|468280b535524b9e|9fddf080f8d5b586|1905615057||t20574.6882262044s|s5022647b|5022647|rds|local|vector|||2.14|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-alt1_plot_nv_group_model|stem|387c576008672b01|163cbd22965cec4a|cf38cfa3a2a11e71|1406534520||t20574.6882275992s|s5017748b|5017748|rds|local|vector|||2.14|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead.|
-plot_comb_group_model|stem|99e24ec308e7ebc3|77459b38bedee4f7|911cc3c839c44571|1278987446||t20574.6882338087s|s167b|167|rds|local|vector|||2.593||
-reproduce_manuscript|stem|18affa20ca5ab9e1|e6bf9a4c0841afb2|b4e4acf58027f2a8|-660736331||t20574.6882942004s|s35651976b|35651976|rds|local|vector|||0||
+func_plot_absolute_measures|function|4975fc376f6058cb
+func_plot_measures_vs_1year_draws|function|07a3e90e8cc0a107
+func_plot_comb_peak_decay_vs|function|140acdd97552482c
+func_tab_nv_second_dose|function|f8c7236fc67ddc5b
+func_plot_measures|function|9795f2ed874fb4b9
+func_plot_prior_posterior_draws_sens|function|e525ad0eed074eb6
+func_tab_iga_igg|function|66799eba85cc6941
+func_tab_model_metrics|function|770c158472b8f350
+func_figure_setup|function|f4c03c5474098b9e
+func_plot_pairwise|function|f6571d808ef9b255
+func_plot_group_model_traj_flexible|function|d2654a4cfe28ad31
+func_plot_group_peak_decay_draws|function|af1ef46bc51cce7a
+func_alt_process_ni_data|function|7ca520041fb1bf15
+func_alt_process_nv_data|function|6bd12ea23aec272a
+func_tab_percent_loss|function|34583985e826bd8c
+func_plot_obs_measures|function|735b81f20c9bfce5
+func_get_obs_measures|function|1331dc4d98119f0c
+func_process_nv_data|function|1cf7fa2caa050d47
+func_setup_model_flexible|function|50773b0870052e82
+func_process_ni_data|function|1cf7fa2caa050d47
+func_fit_models|function|313d3c1ac93d2bcc
+func_plot_random_effects|function|53a06b52b642e1df
+func_tab_model_diagnostics|function|3cb4fc53209be7f7
+func_setup_model_prior_sens|function|2a4775b3ec7c94e6
+func_pairwise_compare|function|6f0e5b90c3dc93d8
+func_plot_group_model_traj_linear|function|d73718351e8107aa
+func_get_correlations|function|67641ab55ea8d573
+func_process_draws|function|cf6e66519a7526f4
+func_tab_correlations|function|7d94e10d201903b9
+func_plot_id_model|function|8edd6a13a2236a0a
+func_plot_fitted_observed|function|8b59de6cb365c5bf
+func_get_model_metrics|function|d884c3b9f3a827be
+func_get_prior_posterior_draws|function|090d3b7fc4279002
+func_plot_trace|function|b5c9f4cf2748ebdf
+func_tab_prior_sens|function|8da3c3f61722b753
+func_get_model_metrics_flexible|function|4befc47f1996aea5
+func_tab_dose_median_iqr|function|6bf287ccca32cf96
+func_plot_group_model_traj|function|e961fea54f975d00
+func_plot_schematic|function|83154fb3f0274e51
+func_get_preds|function|5d7fe7593714cd4c
+func_get_measures_group|function|e302afb7b17a7f68
+controller_local|object|f5a6a9de1a3f8ff5
+func_setup_model|function|8b65c5f9f2aca5cc
+func_plot_pairwise_compare|function|9c3baafb1de4f35b
+func_get_residuals|function|694baff062ff5681
+func_process_preds|function|e4f92bac516bea18
+func_plot_comb_group_peak_decay_1year_draws|function|54e0e093dc011bc0
+func_plot_measures_auc|function|6d33c2ee1ac3c398
+plot_ni_obs_measures|stem|17188268c5b452c3|4c24c0ba749ae72d|94504f059109e6dd|1359357672||t20679.6728426098s|s1444931b|1444931|rds|local|vector|||5||
+plot_ni_fitted_observed|stem|3e3436fa5f74cf30|deebb67478e9d38e|741591d36185191a|270753806||t20679.6728506254s|s2696625b|2696625|rds|local|vector|||3.609||
+plot_nv_obs_measures|stem|f8044ad690c070c8|9d7805cb4d0f3a5b|d008dab57e8e0f9c|-343550109||t20679.6728532842s|s1521841b|1521841|rds|local|vector|||6.422|Removed 1 row containing non-finite outside the scale range (`stat_smooth()`).|
+plot_nv_fitted_observed|stem|636d40c4e59b9446|fa9439ebcbf49d09|7cf33a600d515c84|-861592982||t20679.6728694388s|s4849474b|4849474|rds|local|vector|||5.438||

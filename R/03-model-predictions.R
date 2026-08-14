@@ -191,18 +191,19 @@ func_get_residuals <- function(dat_pred, dat_obs) {
   days <- unique(dat_obs$day)
   dat_pred_red <- dat_pred %>%
     filter(day %in% days) %>%
-    select(id, model_func=model, antibody, day, dose, y_pred=y)
+    select(id, model_func=model, antibody, day, dose, y_pred=y, logy_pred=logy)
   
   # remove censored obs
   dat_obs_red <- dat_obs %>%
     filter(cens == 0) %>%
-    select(id, study, dose, day, antibody, antibody_clean, y_obs=y)
+    select(id, study, dose, day, antibody, antibody_clean, y_obs=y, logy_obs = logy)
   
   residuals <- left_join(
     dat_obs_red, dat_pred_red, by=c("id","day","antibody","dose")
   ) %>%
     mutate(
       residual = y_obs - y_pred,
+      residual_log = logy_obs - logy_pred,
       model = paste(
         stringr::str_to_upper(study), model_func, antibody, 
         sep="_"

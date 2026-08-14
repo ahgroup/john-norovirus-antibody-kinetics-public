@@ -71,8 +71,7 @@ list(
     reproduce_manuscript,
     list(
       tab_model_metrics,
-      plot_ni_group_model,
-      plot_nv_group_model,
+      plot_comb_group_model,
       plot_ni_pow_measures,
       plot_nv_pow_measures,
       plot_measures_vs_1year_draws,
@@ -315,16 +314,14 @@ list(
   tar_target(
     process_ni_group_measures,
     func_process_measures(
-      measures=get_ni_group_measures,
-      use_id=FALSE
+      measures=get_ni_group_measures
     )
   ),
   
   tar_target(
     process_nv_group_measures,
     func_process_measures(
-      measures=get_nv_group_measures,
-      use_id=FALSE
+      measures=get_nv_group_measures
     )
   ),
   
@@ -389,8 +386,65 @@ list(
   ),
   
   ###
+  # observed measures
+  ###
+  tar_target(
+    get_ni_obs_measures,
+    func_get_obs_measures(
+      data=process_ni_data
+    )
+  ),
+  
+  tar_target(
+    get_nv_obs_measures,
+    func_get_obs_measures(
+      data=process_nv_data
+    )
+  ),
+  
+  ###
   ### 05 tables ====
   ###
+  
+  ###
+  # model diagnostics
+  ###
+  
+  tar_target(
+    tab_ni_model_diagnostics,
+    func_tab_model_diagnostics(
+      models=fit_ni_models,
+      filepath=here::here("results/tables/model-diagnostics/tab-")
+    )
+  ),
+  
+  tar_target(
+    tab_nv_model_diagnostics,
+    func_tab_model_diagnostics(
+      models=fit_nv_models,
+      filepath=here::here("results/tables/model-diagnostics/tab-")
+    )
+  ),
+  
+  ###
+  # random effects
+  ###
+  
+  tar_target(
+    tab_ni_random_effect_sd,
+    func_tab_random_effect_sd(
+      models=fit_ni_models,
+      filepath=here::here("results/tables/random-effect-sd/")
+    )
+  ),
+  
+  tar_target(
+    tab_nv_random_effect_sd,
+    func_tab_random_effect_sd(
+      models=fit_nv_models,
+      filepath=here::here("results/tables/random-effect-sd/")
+    )
+  ),
   
   ###
   # model metrics
@@ -448,6 +502,79 @@ list(
       by="overall", 
       baseline=TRUE,
       filepath=here::here("results/tables/correlations/overall/tab-cor-overall")
+    )
+  ),
+  
+  ###
+  # percent antibody loss
+  ###
+  
+  tar_target(
+    tab_ni_percent_loss,
+    func_tab_percent_loss(
+      predictions=process_ni_group_preds,
+      filepath=here::here("results/tables/percent-antibody-loss/tab-ni-percent-loss.rds")
+    )
+  ),
+  
+  tar_target(
+    tab_nv_percent_loss,
+    func_tab_percent_loss(
+      predictions=process_nv_group_preds,
+      filepath=here::here("results/tables/percent-antibody-loss/tab-nv-percent-loss.rds")
+    )
+  ),
+  
+  ###
+  # dose median and iqr
+  ###
+  
+  tar_target(
+    tab_ni_dose_median_iqr,
+    func_tab_dose_median_iqr(
+      data=process_ni_data,
+      filepath=here::here("results/tables/dose-median-iqr/tab-ni-dose-median-iqr-")
+    )
+  ),
+  
+  tar_target(
+    tab_nv_dose_median_iqr,
+    func_tab_dose_median_iqr(
+      data=process_nv_data,
+      filepath=here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-")
+    )
+  ),
+  
+  ###
+  # iga:igg ratios
+  ###
+  
+  tar_target(
+    tab_ni_iga_igg,
+    func_tab_iga_igg(
+      draws=process_ni_group_draws$draws_all,
+      filepath=here::here("results/tables/iga-igg-ratios/tab-ni-iga-igg.rds")
+    )
+  ),
+  
+  tar_target(
+    tab_nv_iga_igg,
+    func_tab_iga_igg(
+      draws=process_nv_group_draws$draws_all,
+      filepath=here::here("results/tables/iga-igg-ratios/tab-nv-iga-igg.rds")
+    )
+  ),
+  
+  ###
+  # nv second dose
+  ###
+  
+  tar_target(
+    tab_nv_second_dose,
+    func_tab_nv_second_dose(
+      data=process_nv_data,
+      filepath1=here::here("results/tables/nv-second-dose/tab-nv-second-dose.rds"),
+      filepath2=here::here("results/tables/nv-second-dose/tab-nv-peak")
     )
   ),
   
@@ -608,7 +735,55 @@ list(
   ),
   
   ###
-  # prior posterior check
+  # spaghetti plots
+  ###
+  
+  tar_target(
+    plot_ni_spaghetti,
+    func_plot_spaghetti(
+      data=process_ni_data,
+      filepath=here::here("results/figures/supplement/spaghetti-plots/spaghetti-plot-ni.png"),
+      width=7,
+      height=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_spaghetti,
+    func_plot_spaghetti(
+      data=process_nv_data,
+      filepath=here::here("results/figures/supplement/spaghetti-plots/spaghetti-plot-nv.png"),
+      width=10,
+      height=7
+    )
+  ),
+  
+  ###
+  # trace plots
+  ###
+  
+  tar_target(
+    plot_ni_trace,
+    func_plot_trace(
+      models=fit_ni_models,
+      filepath=here::here("results/figures/supplement/trace-plots/"),
+      width=9,
+      height=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_trace,
+    func_plot_trace(
+      models=fit_nv_models,
+      filepath=here::here("results/figures/supplement/trace-plots/"),
+      width=9,
+      height=5
+    )
+  ),
+  
+  ###
+  # prior posterior distributions
   ###
   
   tar_target(
@@ -632,24 +807,95 @@ list(
   ),
   
   ###
+  # pairwise plots
+  ###
+  
+  tar_target(
+    plot_ni_pairwise,
+    func_plot_pairwise(
+      models=fit_ni_models,
+      filepath=here::here("results/figures/supplement/pairwise-plots/"),
+      width=9,
+      height=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_pairwise,
+    func_plot_pairwise(
+      models=fit_nv_models,
+      filepath=here::here("results/figures/supplement/pairwise-plots/"),
+      width=9,
+      height=5
+    )
+  ),
+  
+  # random effects
+  tar_target(
+    plot_ni_random_effects,
+    func_plot_random_effects(
+      models=fit_ni_models,
+      filepath=here::here("results/figures/supplement/random-effects/"),
+      width=9,
+      height=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_random_effects,
+    func_plot_random_effects(
+      models=fit_nv_models,
+      filepath=here::here("results/figures/supplement/random-effects/"),
+      width=9,
+      height=7
+    )
+  ),
+  
+  ###
+  # linear y axis model trajectories
+  ###
+  
+  tar_target(
+    plot_ni_group_model_linear,
+    func_plot_group_model_traj_linear(
+      predictions=process_ni_group_preds,
+      data=process_ni_data,
+      filepath=here::here("results/figures/supplement/linear-trajectory-plots/plot-ni-model-trajectories-linear.png"),
+      height=5,
+      width=7
+    )
+  ),
+
+  tar_target(
+    plot_nv_group_model_linear,
+    func_plot_group_model_traj_linear(
+      predictions=process_nv_group_preds,
+      data=process_nv_data,
+      filepath=here::here("results/figures/supplement/linear-trajectory-plots/plot-nv-model-trajectories-linear.png"),
+      height=7,
+      width=10
+    )
+  ),
+  
+  ###
   # fitted vs observed
   ###
   
   tar_target(
-    plot_ni_fitted_vs_observed,
-    func_plot_fitted_vs_observed(
+    plot_ni_fitted_observed,
+    func_plot_fitted_observed(
       residuals=get_ni_residuals,
-      file_path=here::here("results/figures/supplement/fitted-observed-plots/plot-ni-fitted-observed.png"),
+      filepath=here::here("results/figures/supplement/fitted-observed/plot-ni-"),
       width=7,
       height=5
     )
   ),
   
   tar_target(
-    plot_nv_fitted_vs_observed,
-    func_plot_fitted_vs_observed(
+    plot_nv_fitted_observed,
+    func_plot_fitted_observed(
       residuals=get_nv_residuals,
-      file_path=here::here("results/figures/supplement/fitted-observed-plots/plot-nv-fitted-observed.png"),
+      filepath=here::here("results/figures/supplement/fitted-observed/plot-nv-"),
       width=9,
       height=11
     )
@@ -1154,11 +1400,61 @@ list(
   ),
   
   ###
+  # AUC measures
+  ###
+  
+  tar_target(
+    plot_ni_pow_measures_auc,
+    func_plot_measures_auc(
+      setup=fig_setup,
+      dat_group=process_ni_group_measures,
+      model_name="pow",
+      study_name="NI",
+      filepath=here::here("results/figures/supplement/plot-measures-auc/plot-ni-measures-auc.png"),
+      height=6, width=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_pow_measures_auc,
+    func_plot_measures_auc(
+      setup=fig_setup,
+      dat_group=process_nv_group_measures,
+      model_name="pow",
+      study_name="NV",
+      filepath=here::here("results/figures/supplement/plot-measures-auc/plot-nv-measures-auc.png"),
+      height=6, width=8
+    )
+  ),
+  
+  ###
+  # observed measures
+  ###
+  
+  tar_target(
+    plot_ni_obs_measures,
+    func_plot_obs_measures(
+      measures=get_ni_obs_measures,
+      filepath=here::here("results/figures/supplement/obs-measures/ni-"),
+      height=2.7, width=8
+    )
+  ),
+  
+  tar_target(
+    plot_nv_obs_measures,
+    func_plot_obs_measures(
+      measures=get_nv_obs_measures,
+      filepath=here::here("results/figures/supplement/obs-measures/nv-"),
+      height=5, width=8
+    )
+  ),
+  
+  ###
   ### 08 supplement analyses ====
   ###
   
   ###
-  # alternative censoring bounds
+  #### alternative censoring bounds ====
   ###
   
   ###
@@ -1280,16 +1576,14 @@ list(
   tar_target(
     alt1_process_ni_group_measures,
     func_process_measures(
-      measures=alt1_get_ni_group_measures,
-      use_id=FALSE
+      measures=alt1_get_ni_group_measures
     )
   ),
   
   tar_target(
     alt1_process_nv_group_measures,
     func_process_measures(
-      measures=alt1_get_nv_group_measures,
-      use_id=FALSE
+      measures=alt1_get_nv_group_measures
     )
   ),
   
@@ -1455,16 +1749,14 @@ list(
   tar_target(
     alt2_process_ni_group_measures,
     func_process_measures(
-      measures=alt2_get_ni_group_measures,
-      use_id=FALSE
+      measures=alt2_get_ni_group_measures
     )
   ),
   
   tar_target(
     alt2_process_nv_group_measures,
     func_process_measures(
-      measures=alt2_get_nv_group_measures,
-      use_id=FALSE
+      measures=alt2_get_nv_group_measures
     )
   ),
   
@@ -1527,5 +1819,189 @@ list(
       filepath=here::here("results/figures/supplement/cens-bound-sensitivity/decrease/plot-nv-measures.png"), 
       height=7, width=8
     )
+  ),
+  
+  ###
+  #### prior sensitivity ====
+  ###
+  
+  # wider priors (double the sd)
+  
+  ###
+  ### model fitting
+  ###
+  
+  tar_target(
+    setup_model_prior_sens,
+    func_setup_model_prior_sens()
+  ),
+  
+  ###
+  # fit models
+  ###
+  
+  tar_target(
+    fit_ni_models_prior_sens,
+    func_fit_models(
+      data=process_ni_data,
+      setup=setup_model_prior_sens
+    )
+  ),
+  
+  tar_target(
+    fit_nv_models_prior_sens,
+    func_fit_models(
+      data=process_nv_data,
+      setup=setup_model_prior_sens
+    )
+  ),
+  
+  ###
+  # population-level predictions
+  ###
+  
+  tar_target(
+    get_ni_group_preds_prior_sens,
+    func_get_preds(
+      data=process_ni_data,
+      models=fit_ni_models_prior_sens,
+      use_id=FALSE
+    )
+  ),
+  
+  tar_target(
+    get_nv_group_preds_prior_sens,
+    func_get_preds(
+      data=process_nv_data,
+      models=fit_nv_models_prior_sens,
+      use_id=FALSE
+    )
+  ),
+  
+  ###
+  # get prior and posterior draws
+  ###
+  
+  tar_target(
+    get_ni_prior_posterior_draws_prior_sens,
+    func_get_prior_posterior_draws(
+      models=fit_ni_models_prior_sens
+    )
+  ),
+  
+  tar_target(
+    get_nv_prior_posterior_draws_prior_sens,
+    func_get_prior_posterior_draws(
+      models=fit_nv_models_prior_sens
+    )
+  ),
+  
+  ###
+  # population-level measures
+  ###
+  
+  tar_target(
+    get_ni_group_measures_prior_sens,
+    func_get_measures_group(
+      data=process_ni_data,
+      models=fit_ni_models_prior_sens,
+      preds=get_ni_group_preds_prior_sens
+    )
+  ),
+  
+  tar_target(
+    get_nv_group_measures_prior_sens,
+    func_get_measures_group(
+      data=process_nv_data,
+      models=fit_nv_models_prior_sens,
+      preds=get_nv_group_preds_prior_sens
+    )
+  ),
+  
+  ###
+  # process measures
+  ###
+  
+  tar_target(
+    process_ni_group_measures_prior_sens,
+    func_process_measures(
+      measures=get_ni_group_measures_prior_sens
+    )
+  ),
+  
+  tar_target(
+    process_nv_group_measures_prior_sens,
+    func_process_measures(
+      measures=get_nv_group_measures_prior_sens
+    )
+  ),
+  
+  ###
+  # measures
+  ###
+  
+  tar_target(
+    plot_ni_pow_measures_prior_sens,
+    func_plot_measures(
+      dat_group=process_ni_group_measures_prior_sens, 
+      model_name="pow", 
+      study_name="NI",
+      filepath=here::here("results/figures/supplement/prior-sensitivity/plot-ni-measures.png"), 
+      height=7, width=5
+    )
+  ),
+  
+  tar_target(
+    plot_nv_pow_measures_prior_sens,
+    func_plot_measures(
+      dat_group=process_nv_group_measures_prior_sens, 
+      model_name="pow", 
+      study_name="NV",
+      filepath=here::here("results/figures/supplement/prior-sensitivity/plot-nv-measures.png"), 
+      height=7, width=8
+    )
+  ),
+  
+  ###
+  # prior posterior distributions
+  ###
+  
+  tar_target(
+    plot_ni_prior_posterior_draws_prior_sens,
+    func_plot_prior_posterior_draws_sens(
+      draws_main=get_ni_prior_posterior_draws,
+      draws_sens=get_ni_prior_posterior_draws_prior_sens,
+      file_path=here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots"),
+      width=6,
+      height=4
+    )
+  ),
+  
+  tar_target(
+    plot_nv_prior_posterior_draws_prior_sens,
+    func_plot_prior_posterior_draws_sens(
+      draws_main=get_nv_prior_posterior_draws,
+      draws_sens=get_nv_prior_posterior_draws_prior_sens,
+      file_path=here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots"),
+      width=6,
+      height=5
+    )
+  ),
+  
+  # prior sensitivity analysis
+  tar_target(
+    tab_prior_sens,
+    func_tab_prior_sens(
+      measures_ni_main=process_ni_group_measures, 
+      measures_nv_main=process_nv_group_measures, 
+      measures_ni_sens=process_ni_group_measures_prior_sens, 
+      measures_nv_sens=process_nv_group_measures_prior_sens,
+      filepath=here::here("results/tables/prior-sensitivity/tab-")
+    )
   )
+  
 )
+
+
+
+# END OF SCRIPT ====

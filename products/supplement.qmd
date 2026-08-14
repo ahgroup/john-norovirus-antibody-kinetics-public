@@ -3,6 +3,7 @@ title: "Supplementary Material: Impact of dose on norovirus antibody kinetics fo
 author: " "
 format: 
   docx:
+    fig-dpi: 150
     toc: true
     number-sections: true
 bibliography: ../products/john-norovirus-antibody-kinetics-supplement.bib
@@ -75,9 +76,11 @@ To ensure biologically plausible trajectories, models were fit on the natural lo
 
 $$\eta_{i,t} = \frac{\exp(p_i)}{1+\exp(-\exp(g_i)\cdot(t-\exp(k_i)))}$$
 
+where $P = \exp(p_i)$, $G = \exp(g_i)$, and $K = \exp(k_i)$.
+
 ### Antibody decay models
 
-We implemented two decay models: exponential and power-law. The exponential model assumes a constant rate of decay, whereas the power-law model allows the decay rate to slow over time, which may better reflect long-term immune memory dynamics. In both models, the decay parameter is denoted by $D$.
+We implemented two decay models: exponential and power-law. The exponential model assumes a constant rate of decay, whereas the power-law model allows the decay rate to slow over time, which may better reflect long-term immune memory dynamics. In both models, the decay parameter is denoted by $D_i$.
 
 Exponential decay model: 
 
@@ -87,40 +90,51 @@ Power-law decay model:
 
 $$t^{-D_2}$$
 
-Because the power-law function is undefined at $t=0$, we shift the time scale by one unit by replacing $t$ with $t+1$ to avoid singularities. As with the induction phase, the decay parameter is exponentiated to ensure positivity: $D = \exp(d_i)$. Individual variation is captured through subject-specific random effects on $d_i$.
+Because the power-law function is undefined at $t=0$, we shift the time scale by one unit by replacing $t$ with $t+1$ to avoid singularities. As with the induction phase, the decay parameter is exponentiated to ensure positivity such that $D = \exp(d_i)$. Subject-specific random effects on $d_i$ capture individual variation in decay.
 
 ### Full generative models
 
-The full models were constructed as the product of the induction and decay components, expressed on the log scale. Let $\eta_{i,t}$ = $E[\text{log}(y_{i,t})]$ denote the expected log antibody level for individual $i$ at time $t$.
+The full models were constructed as the product of the induction and decay components, expressed on the log scale. Let $\eta_{i,t}$ denote the mean log antibody level for individual $i$ at time $t$.
 
 Exponential decay model:
 
-$$\eta_{i,t} = \ln \left( \frac{\exp(p_{i_1})}{1+\exp(-\exp(g_{i_1})\cdot(t-\exp(k_{i_1})))} \cdot \exp(-\exp(d_{i_1}) \cdot t) \right)$$
+$$\eta_{i,t} = \log \left( \frac{\exp(p_{i_1})}{1+\exp(-\exp(g_{i_1})\cdot(t-\exp(k_{i_1})))} \cdot \exp(-\exp(d_{i_1}) \cdot t) \right)$$
 
 Power-law decay model:
 
-$$\eta_{i,t} = \ln \left( \frac{\exp(p_{i_2})}{1+\exp(-\exp(g_{i_2})\cdot((t+1)-\exp(k_{i_2})))} \cdot (t+1)^{-\exp(d_{i_2})} \right)$$
+$$\eta_{i,t} = \log \left( \frac{\exp(p_{i_2})}{1+\exp(-\exp(g_{i_2})\cdot((t+1)-\exp(k_{i_2})))} \cdot (t+1)^{-\exp(d_{i_2})} \right)$$
 
 ## Statistical model specification
 
-Models were implemented in a Bayesian framework with weakly informative priors. All models assumed a Student-$t$ likelihood on the log scale to accommodate heavy-tailed biological variation and outliers. The degrees of freedom parameter $v$ was fixed at 4, and the residual scale parameter $\sigma$ was assigned a Half-Student-$t(3,0,2)$ prior.
+### Likelihood and hierarchical structure
+
+Models were implemented in a Bayesian hierarchical framework. Antibody measurements were modeled on the log scale using a Student-$t$ likelihood to accommodate heavy-tailed biological variation and outliers. The degrees of freedom parameter $v$ was fixed at 4, and the residual scale parameter $\sigma$ was assigned a Half-Student-$t(3,0,2)$ prior.
 
 $$\text{log}(y_{i,t}) \sim \text{Student}(v=4,\eta_{i,t},\sigma)$$
 
 $$\sigma \sim \text{Half-Student}(3,0,2)$$
 
+The expected antibody trajectory $\eta_{i,t}$ was defined by the kinetic functions described above. Dose level was included as a categorical predictor using a cell-means parameterization, allowing each dose group to have its own population-level kinetic parameters $p_{dose_i}, g_{dose_i}, k_{dose_i}, d_{dose_i}$. We modeled individual-level variation using additive random effects on the latent parameter scale. We modeled random effects for each parameter as zero-centered normal deviations with parameter-specific standard deviations.
 
-The expected antibody trajectory $\eta_{i,t}$ was defined as the product of the induction and decay components, with model-specific functional forms described below.
+### Prior specification for kinetic parameters
 
-Dose level was included as a categorical predictor using a cell-means parameterization, allowing each dose group to have its own baseline trajectory parameters $p_{dose_i}, g_{dose_i}, k_{dose_i}, d_{dose_i}$. Individual-level variation was modeled using additive random effects on the latent parameter scale, denoted $p_{0,i}, g_{0,i}, k_{0,i}, d_{0,i}$. We assumed all random effects for a given parameter were drawn from the same underlying distribution.
+Nonlinear kinetic models can exhibit weak parameter identifiability, particularly when estimating multiple trajectory parameters. We therefore used biologically motivated priors to regularize biologically implausible trajectories while allowing the observed data to inform posterior inference. Priors were selected based on expected antibody response magnitudes and biological timescales rather than diffuse priors that could permit unrealistic kinetic behavior.
 
-Reflecting biological knowledge of antibody kinetics, weakly informative priors were assigned to latent model parameters: induction asymptote $p \sim \text{Normal}(7,2)$, growth rate $g \sim \text{Normal}(0,1.5)$, and inflection point $k \sim \text{Normal}(\log(10),1)$. We used separate priors for the exponential and power-law model decay parameters: $d_{exp} \sim \text{Normal}(-4,1.5)$ and $d_{pow} \sim \text{Normal}(-1,1.5)$. Random effect standard deviations were assigned Half-Student-$t(3,0,2)$ priors. All priors were assessed using prior and posterior predictive checks (@fig-prior-post-1 - @fig-prior-post-16).
+The peak parameter was assigned $p \sim \text{Normal}(7,2)$ on the log scale. Because the model uses $\exp(p)$ as the peak response magnitude, this corresponds to a log-normal prior on the original scale with a median peak response of $\exp(7)\approx1,100$ units and an approximate 95% interval of approximately 22 to 55,000 units.
+
+The growth parameter was assigned $g \sim \text{Normal}(0,1.5)$ on the log scale. This corresponds to a log-normal prior on the original scale with a median growth rate of 1 and an approximate 95% prior interval of 0.05 to 19.
+
+The time-to-peak parameter was assigned $k \sim \text{Normal}(\log(10),1)$. This corresponds to a log-normal prior on the original scale with a median expected time scale of 10 days, with an approximate 95% prior interval of 1.4 to 72 days.
+
+The decay parameter was assigned separate priors for each model because it has different interpretations under the exponential and power-law formulations. For the exponential model, $d_{1} \sim \text{Normal}(-4,1.5)$, corresponds to a median decay rate of 0.018 and an approximate 95% prior interval of 0.001 to 0.35. For the power-law model, $d_{2} \sim \text{Normal}(-1,1.5)$ corresponds to a log-normal prior on the power-law exponent with a median value of 0.37 and an approximate 95% prior interval of 0.02 to 4.65.
+
+Random effect standard deviations were assigned Half-Student-$t(3,0,2)$ priors. Prior distributions were evaluated by comparing prior and posterior parameter distributions (@fig-prior-sens-1 - @fig-prior-sens-16).
 
 ### Exponential decay model
 
 Time-series equation:
 
-$$\eta_{i,t} = \ln \left( \frac{\exp(p_{i_1})}{1+\exp(-\exp(g_{i_1})\cdot(t-\exp(k_{i_1})))} \cdot \exp(-\exp(d_{i_1}) \cdot t) \right)$$
+$$\eta_{i,t} = \log \left( \frac{\exp(p_{i_1})}{1+\exp(-\exp(g_{i_1})\cdot(t-\exp(k_{i_1})))} \cdot \exp(-\exp(d_{i_1}) \cdot t) \right)$$
 Parameter definitions:
 
 $$p_{i_1} = p_{0,i} + p_{1,dose_i}$$
@@ -137,7 +151,7 @@ $$p_{0,i}, g_{0,i}, k_{0,i}, d_{0,i} \sim \text{Normal}(0, \gamma_{\cdot})$$
 
 with group-level scales:
 
-$$\gamma_p, \gamma_g, \gamma_k, \gamma_d \sim \text{Half-Student}(3,0,2)$$
+$$\sigma_p, \sigma_g, \sigma_k, \sigma_d \sim \text{Half-Student}(3,0,2)$$
 Dose effects:
 
 $$p_{1,dose_i} \sim \text{Normal}(7,2)$$
@@ -152,7 +166,7 @@ $$d_{1,dose_i} \sim \text{Normal}(-4,1.5)$$
 
 Time-series equation:
 
-$$\eta_{i,t} = \ln \left( \frac{\exp(p_{i_2})}{1+\exp(-\exp(g_{i_2})\cdot((t+1)-\exp(k_{i_2})))} \cdot (t+1)^{-\exp(d_{i_2})} \right)$$
+$$\eta_{i,t} = \log \left( \frac{\exp(p_{i_2})}{1+\exp(-\exp(g_{i_2})\cdot((t+1)-\exp(k_{i_2})))} \cdot (t+1)^{-\exp(d_{i_2})} \right)$$
 
 Parameter definitions:
 
@@ -182,84 +196,66 @@ $$k_{2,dose_i} \sim \text{Normal}(\log(10),1)$$
 
 $$d_{2,dose_i} \sim \text{Normal}(-1,1.5)$$
 
-## Model implementation and computation
+## Model implementation
+
+### Computation
 
 Models were implemented using the `brms` package [@burkner2021a], which uses Hamiltonian Monte Carlo (HMC) implemented via Stan, to draw posterior samples of the model parameters. Each model was fit with 3,000 iterations per chain, including 1,000 warm-up iterations and 2,000 post-warmup samples. With four parallel Markov chains, this resulted in a total of 8,000 posterior samples per model. An adaptive delta of 0.99 was used to reduce divergent transitions, and the maximum tree depth was set to 15, corresponding to a maximum of $2^{15}=32,768$ leapfrog steps per iteration. We used the default values for all other algorithm parameters.
 
 ### Censoring
 
-Censoring rules were defined based on assay characteristics, prior literature, and observed clusters in the data. For HBGA measurements, the assay detection range was 25 to 3200. In the NI study, the lower limits of detection were 0.8 for IgA and 0.7 for IgG, whereas in the NV study they were 3.1 for IgA and 1.6 for IgG. Observations at or above the upper detection limit were treated as right-censored, and those at or below the lower detection limit were treated as interval-censored, with lower bounds set to $10^{-6}$ and upper bounds equal to the assay-specific detection limit. The lower bound of $10^{-6}$ was chosen to avoid undefined values on the log scale, as antibody levels are strictly positive. Censoring was directly incorporated into the likelihood using the censored-response functionality of the Bayesian models implemented in brms, allowing both right- and interval-censored observations to contribute appropriately to posterior inference. The number of censored observations by antibody, dose, and collection timepoint is reported for the NI study (@tbl-ni-cens-GI1-HBGA-4p8 - @tbl-ni-cens-GI1-IgG-4800) and the NV study (@tbl-nv-cens-GI1-HBGA-5 - @tbl-nv-cens-GII4-IgG-150).
-
-#### Censoring summary tables
+Censoring rules were defined based on assay characteristics, prior literature, and observed clusters in the data. For HBGA-blocking measurements, the assay detection range was 25 to 3200. In the NI study, the lower limits of detection were 0.8 for IgA and 0.7 for IgG, whereas in the NV study they were 3.1 for IgA and 1.6 for IgG. Observations at or above the upper detection limit were treated as right-censored, and those at or below the lower detection limit were treated as interval-censored, with lower bounds set to $10^{-6}$ and upper bounds equal to the assay-specific detection limit. The lower bound of $10^{-6}$ was chosen to avoid undefined values on the log scale, as antibody levels are strictly positive. Censoring was directly incorporated into the likelihood using the censored-response functionality of the Bayesian models implemented in brms, allowing both right- and interval-censored observations to contribute appropriately to posterior inference. The number of censored observations by antibody, dose, and collection timepoint is reported for the NI study (@tbl-ni-cens-GI1-HBGA-4p8 - @tbl-ni-cens-GI1-IgG-4800) and the NV study (@tbl-nv-cens-GI1-HBGA-5 - @tbl-nv-cens-GII4-IgG-150).
 
 ```{r}
 #| label: tbl-ni-cens-GI1-HBGA-4p8
-#| tbl-cap: "NI GI.1 HBGA 4.8"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 HBGA-4.8.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-HBGA-48
-#| tbl-cap: "NI GI.1 HBGA 48"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 HBGA-48.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-HBGA-4800
-#| tbl-cap: "NI GI.1 HBGA 4800"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 HBGA-4800.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgA-4p8
-#| tbl-cap: "NI GI.1 IgA 4.8"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgA-4.8.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgA-48
-#| tbl-cap: "NI GI.1 IgA 48"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgA-48.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgA-4800
-#| tbl-cap: "NI GI.1 IgA 4800"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgA-4800.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgG-4p8
-#| tbl-cap: "NI GI.1 IgG 4.8"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgG-4.8.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgG-48
-#| tbl-cap: "NI GI.1 IgG 48"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgG-48.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-cens-GI1-IgG-4800
-#| tbl-cap: "NI GI.1 IgG 4800"
-
 readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgG-4800.rds")) |>
   fit_flextable_to_page()
 ```
@@ -267,243 +263,243 @@ readRDS(here::here("results/tables/n-cens/ni/tab-ni-cens-GI.1 IgG-4800.rds")) |>
 
 ```{r}
 #| label: tbl-nv-cens-GI1-HBGA-5
-#| tbl-cap: "NV GI.1 HBGA 5"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 HBGA-5.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-HBGA-15
-#| tbl-cap: "NV GI.1 HBGA 15"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 HBGA-15.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-HBGA-50
-#| tbl-cap: "NV GI.1 HBGA 50"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 HBGA-50.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-HBGA-150
-#| tbl-cap: "NV GI.1 HBGA 150"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 HBGA-150.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgA-5
-#| tbl-cap: "NV GI.1 IgA 5"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgA-5.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgA-15
-#| tbl-cap: "NV GI.1 IgA 15"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgA-15.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgA-50
-#| tbl-cap: "NV GI.1 IgA 50"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgA-50.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgA-150
-#| tbl-cap: "NV GI.1 IgA 150"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgA-150.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgG-5
-#| tbl-cap: "NV GI.1 IgG 5"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgG-5.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgG-15
-#| tbl-cap: "NV GI.1 IgG 15"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgG-15.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgG-50
-#| tbl-cap: "NV GI.1 IgG 50"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgG-50.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GI1-IgG-150
-#| tbl-cap: "NV GI.1 IgG 150"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GI.1 IgG-150.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgA-5
-#| tbl-cap: "NV GII.4 IgA 5"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgA-5.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgA-15
-#| tbl-cap: "NV GII.4 IgA 15"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgA-15.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgA-50
-#| tbl-cap: "NV GII.4 IgA 50"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgA-50.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgA-150
-#| tbl-cap: "NV GII.4 IgA 150"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgA-150.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgG-5
-#| tbl-cap: "NV GII.4 IgG 5"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgG-5.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgG-15
-#| tbl-cap: "NV GII.4 IgG 15"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgG-15.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgG-50
-#| tbl-cap: "NV GII.4 IgG 50"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgG-50.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-cens-GII4-IgG-150
-#| tbl-cap: "NV GII.4 IgG 150"
-
 readRDS(here::here("results/tables/n-cens/nv/tab-nv-cens-GII.4 IgG-150.rds")) |>
   fit_flextable_to_page()
 ```
 
-## Model evaluation
+## Model assessment
 
-A total of 16 models were fit, stratified by study, antibody, and decay function. Across analyses, posterior distributions were largely informed by the data, indicating that the weakly informative priors had minimal influence on the results (@fig-prior-post-1 - @fig-prior-post-16). Model performance was further supported by fitted-versus-observed plots (@fig-ni-fitted-observed, @fig-nv-fitted-observed), which demonstrated good agreement between predictions and data.
+A total of 16 models were fit, stratified by study, antibody, and decay function. We compared the parameter distributions under the original and broader prior specifications in @fig-prior-sens-1 - @fig-prior-sens-16. These figures also show the corresponding posterior distributions under each prior specification and illustrate how the observed data updated the priors. Figures showing only the implemented priors and corresponding posterior distributions were also generated and are available in the Github repository. Model performance was further supported by fitted-versus-observed plots (@fig-ni-fitted-observed, @fig-nv-fitted-observed). The fitted values generally captured the overall range and temporal pattern of the observed responses.
 
-### Posterior predictive checks
-```{r fig-prior-post-1, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni/NI_exp_GI.1_HBGA.png"))
+### Prior and posterior distributions
+
+```{r fig-prior-sens-1, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_exp_GI.1_HBGA.png"))
 ```
 
-```{r fig-prior-post-2, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni/NI_exp_GI.1_IgA.png"))
+```{r fig-prior-sens-2, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_exp_GI.1_IgA.png"))
 ```
 
-```{r fig-prior-post-3, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni/NI_exp_GI.1_IgG.png"))
+```{r fig-prior-sens-3, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_exp_GI.1_IgG.png"))
 ```
 
-```{r fig-prior-post-4, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni/NI_pow_GI.1_HBGA.png"))
+```{r fig-prior-sens-4, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_pow_GI.1_HBGA.png"))
 ```
 
-```{r fig-prior-post-5, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni//NI_pow_GI.1_IgA.png"))
+```{r fig-prior-sens-5, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_pow_GI.1_IgA.png"))
 ```
 
-```{r fig-prior-post-6, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/ni/NI_pow_GI.1_IgG.png"))
+```{r fig-prior-sens-6, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NI_pow_GI.1_IgG.png"))
 ```
 
-```{r fig-prior-post-7, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_exp_GI.1_HBGA.png"))
+```{r fig-prior-sens-7, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_exp_GI.1_HBGA.png"))
 ```
 
-```{r fig-prior-post-8, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_exp_GI.1_IgA.png"))
+```{r fig-prior-sens-8, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_exp_GI.1_IgA.png"))
 ```
 
-```{r fig-prior-post-9, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_exp_GI.1_IgG.png"))
+```{r fig-prior-sens-9, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_exp_GI.1_IgG.png"))
 ```
 
-```{r fig-prior-post-10, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_exp_GII.4_IgA.png"))
+```{r fig-prior-sens-10, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_exp_GII.4_IgA.png"))
 ```
 
-```{r fig-prior-post-11, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_exp_GII.4_IgG.png"))
+```{r fig-prior-sens-11, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_exp_GII.4_IgG.png"))
 ```
 
-```{r fig-prior-post-12, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_pow_GI.1_HBGA.png"))
+```{r fig-prior-sens-12, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_pow_GI.1_HBGA.png"))
 ```
 
-```{r fig-prior-post-13, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_pow_GI.1_IgA.png"))
+```{r fig-prior-sens-13, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_pow_GI.1_IgA.png"))
 ```
 
-```{r fig-prior-post-14, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_pow_GI.1_IgG.png"))
+```{r fig-prior-sens-14, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_pow_GI.1_IgG.png"))
 ```
 
-```{r fig-prior-post-15, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_pow_GII.4_IgA.png"))
+```{r fig-prior-sens-15, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_pow_GII.4_IgA.png"))
 ```
 
-```{r fig-prior-post-16, echo=FALSE, out.width='60%'}
-knitr::include_graphics(here::here("results/figures/supplement/prior-posterior-plots/nv/NV_pow_GII.4_IgG.png"))
+```{r fig-prior-sens-16, echo=FALSE, out.width='60%'}
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/prior-posterior-plots/NV_pow_GII.4_IgG.png"))
 ```
 
-### Fitted vs observed
+### Fitted versus observed values
+
 ```{r fig-ni-fitted-observed, echo=FALSE}
-knitr::include_graphics(here::here('results/figures/supplement/fitted-observed-plots/plot-ni-fitted-observed.png'))
+knitr::include_graphics(here::here('results/figures/supplement/fitted-observed/plot-ni-fitted-observed.png'))
 ```
 
 ```{r fig-nv-fitted-observed, echo=FALSE}
-knitr::include_graphics(here::here('results/figures/supplement/fitted-observed-plots/plot-nv-fitted-observed.png'))
+knitr::include_graphics(here::here('results/figures/supplement/fitted-observed/plot-nv-fitted-observed.png'))
 ```
 
-## Model comparison
+### Pairwise posterior distributions
+
+Pairwise posterior parameter distributions are shown in @fig-ni-pairwise-pow-1 - @fig-nv-pairwise-pow-17. To conserve space, we show the power-law model for all antibodies in the 4.8-dose group in the NI study and the 5-dose group in the NV study as representative examples. Pairwise posterior distributions for all other study, antibody, dose, and decay-function combinations are available in the associated GitHub repository and can be reproduced using the analysis code.
+
+Posterior correlation was observed between the growth rate ($g$) and inflection point ($k$) parameters across most models. In several models, peak magnitude ($p$) and decay rate ($d$) also showed posterior correlation. We conducted a sensitivity analysis using the observed data and found that observed peak and growth rate were negatively associated (@fig-ni-obs-peakday-growth, @fig-nv-obs-peakday-growth), and that observed peak value and decay rate were positively associated (@fig-ni-obs-peak-decay, @fig-nv-obs-peak-decay), as reflected in the pairwise posterior distributions. We can not rule out that these parameter dependencies partially reflect the model structure, but the observed data support the observed associations. These parameter dependencies did not prevent model convergence.
+
+```{r fig-ni-pairwise-pow-1, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NI_pow_GI.1_HBGA_dose4.8.png'))
+```
+
+```{r fig-ni-pairwise-pow-4, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NI_pow_GI.1_IgA_dose4.8.png'))
+```
+
+```{r fig-ni-pairwise-pow-7, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NI_pow_GI.1_IgG_dose4.8.png'))
+```
+
+```{r fig-nv-pairwise-pow-1, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NV_pow_GI.1_HBGA_dose5.png'))
+```
+
+```{r fig-nv-pairwise-pow-5, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NV_pow_GI.1_IgA_dose5.png'))
+```
+
+```{r fig-nv-pairwise-pow-9, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NV_pow_GI.1_IgG_dose5.png'))
+```
+
+```{r fig-nv-pairwise-pow-13, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NV_pow_GII.4_IgA_dose5.png'))
+```
+
+```{r fig-nv-pairwise-pow-17, echo=FALSE}
+knitr::include_graphics(here::here('results/figures/supplement/pairwise-plots/NV_pow_GII.4_IgG_dose5.png'))
+```
+
+### Model comparison
 
 We compared exponential and power-law decay models using approximate leave-one-out cross-validation (LOO-CV) based on the expected log predictive density (ELPD) [@mcelreath2020; @sivula2025]. Model performance was assessed using the difference in expected log predictive density between models, defined as
 
@@ -527,48 +523,54 @@ $$P(\Delta ELPD > 0) = 1 - \Phi(0 | \mu_\Delta, \tilde{\sigma}_{\Delta})$$
 
 Values of $P(\Delta ELPD > 0)$ close to 1 indicate strong support for the power-law model and values close to 0 indicate support for the exponential model.
 
-## Modeling antibody kinetics
+## Posterior prediction and kinetic summaries
 
-To estimate group-level antibody response trajectories over time for both the infection (NI) and vaccination (NV) studies, posterior predictions were generated over a finely spaced grid of time points. Time was discretized into two intervals: from day 0 to day 20 at 4-hour (1/6 day) intervals to capture early dynamics, and from day 20 to day 400 at daily intervals to capture long-term trajectories. Predictions were computed for all dose levels observed in the respective study.
+### Population- and individual-level trajectories
 
-Posterior predictions of the natural log-transformed antibody response were obtained using `brms::posterior_epred()` with `re_formula=NA`, excluding subject-specific random effects to generate population-level predictions. For each time point and dose, posterior summaries were computed using `brms::posterior_summary()` with robust estimation, returning 95% equal-tailed credible intervals (CIs).
+To visualize and summarize population-level antibody response trajectories following infection or vaccination, posterior predictions were generated over a finely spaced grid of time points. Time was discretized into two intervals: from day 0 to day 20 at 4-hour (1/6 day) intervals to capture early antibody induction dynamics, and from day 20 to day 400 at daily intervals to capture longer-term trajectories. Predictions were generated for all dose groups within each study.
 
-Individual-level antibody response trajectories were estimated using the same framework, but retaining subject-specific random effects (`re_formula=NULL`), yielding conditional (subject-specific) trajectories.
+Population-level posterior predictions of the natural log-transformed antibody response were obtained using `brms::posterior_epred()` with `re_formula=NA`, excluding subject-specific random effects. For each time point and dose group, posterior summaries were calculated using `brms::posterior_summary()` with robust estimation, yielding 95% equal-tailed credible intervals (CIs).
 
-## Derived antibody kinetics measures
+Individual-level antibody trajectories were generated using the same approach while retaining subject-specific random effects (`re_formula=NULL`), producing conditional predictions for each participant.
 
-We derived several antibody kinetics measures from the modeled trajectories, as illustrated in @fig-measures-schematic and described below.
+### Derived kinetic measures
+
+We derived several antibody kinetics measures from the modeled trajectories, as illustrated in @fig-measures-schematic and described below. All kinetic summaries were calculated from posterior draws of the group-level trajectories. Individual-level random effects were incorporated during model fitting to account for participant-level variability but were not included in these summaries.
 
 ```{r}
 #| label: fig-measures-schematic
-#| fig-cap: |
-#|   [Schematic showing the derived antibody kinetic measures, including baseline, growth rate, peak titer, peak response, time of peak, decay rate, 1-year titer, and 1-year response.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(here::here('results/figures/supplement/measures-schematic/measures-schematic.png'))
 ```
 
-### Peak magnitude and time
+*Peak magnitude and time*
+
 For each posterior draw, the modeled antibody trajectory was evaluated to identify the maximum titer and the time at which it occurred. Posterior medians and 95% CIs were computed to summarize group-level uncertainty.
 
-### Peak response relative to baseline
+*Peak response relative to baseline*
+
 To assess the contribution of pre-existing antibodies, peak response relative to baseline was defined, for each posterior draw, as the difference between the estimated peak and baseline titers. Posterior medians and 95% CIs were used to summarize uncertainty.
 
-### Early growth rate to peak
+*Early growth rate to peak*
+
 The rate of antibody increase following exposure was estimated for each posterior draw by identifying the time at which the modeled titer reached 50% of its peak value on the original scale, using linear interpolation between points on the prediction grid. The growth rate was then calculated as the slope of the log-transformed titer trajectory between the two grid points bracketing this value to capture the early exponential increase phase. Growth rates are reported per day, and posterior medians with 95% CIs summarize uncertainty.
 
-### Antibody decay rate
-Antibody waning was quantified as the change in modeled, natural log-transformed titer over one-day intervals centered at 60, 90, 180, and 365 days post-exposure. Multiple evaluation time points were used because the power-law model allows time-varying decay, whereas the exponential model assumes a constant decay rate.
+*Antibody decay rate*
 
-### Predicted titer at 1 year
+Antibody waning was quantified as the change in modeled, natural log-transformed titer over one-day intervals centered at 60, 90, 180, and 365 days post-exposure. Multiple evaluation time points were used for the power-law model because decay is time-varying. Only one decay rate is reported for the exponential model, which assumes a constant decay rate.
+
+*Predicted titer at 1 year*
+
 Predicted titer at one year was defined as the posterior-predicted antibody titer at day 365. Posterior medians and 95% CIs were computed across draws.
 
-### Persistence relative to baseline at 1 year
+*Persistence relative to baseline at 1 year*
+
 To quantify antibody persistence relative to pre-existing immunity, predicted titer difference at one year was defined, for each posterior draw, as the difference between the predicted titer at day 365 and the baseline titer. Posterior medians and 95% CIs were summarized across draws.
 
-## Pairwise dose comparisons of posterior kinetic measures
+### Pairwise dose comparisons of kinetic measures
 
-To quantify dose-dependent differences in antibody kinetics, we computed posterior probabilities of pairwise dose comparisons for each kinetic measure, antibody type, and study. For each group, we extracted posterior draws for each dose and formed all ordered pairs of doses. Draws were matched by MCMC iteration and pairs with missing values were excluded. For each dose pair (i, j), we calculated the posterior probability that the measure at dose i exceeded that at dose j as the proportion of paired draws in which the value at dose i was greater:
+To quantify dose-dependent differences in antibody kinetics, we computed posterior probabilities of pairwise dose comparisons for each kinetic measure, antibody type, and study. For each group, we extracted posterior draws for each dose and formed all ordered pairs. Draws were matched by MCMC iteration, and comparisons were computed using paired posterior draws. Any draws with missing values for a given comparison were omitted from that comparison. For each dose pair (i, j), we estimated the posterior probability that the measure at dose i exceeded that at dose j as the proportion of paired draws in which the value at dose i was greater:
 
 $$\text{Pr}(\text{dose}_i > \text{dose}_j) = \frac{1}{S} \sum_{s=1}^{S}{\theta_i^{(s)} > \theta_j^{(s)}}$$
 
@@ -582,14 +584,316 @@ where $\theta^{(s)}$ denotes the $s$-th posterior draw and $S$ is the total numb
 
 ```{r}
 #| label: tbl-demographics
-#| tbl-cap: "Participant demographics by study"
-
 readRDS(here::here("results/tables/demographics/tab-demographics.rds")) |>
   fontsize(size = 7.5, part = "all") |>
   fit_flextable_to_page()
 ```
 
-## Individual-level model-predicted trajectories
+## Observed data
+
+### Observed antibody trajectories
+
+@fig-ni-spaghetti and @fig-nv-spaghetti show the observed individual-level antibody trajectories for the NI and NV studies, respectively. Within each panel, points represent observed antibody titers and are connected by straight lines to illustrate the trajectory over time for each participant. When multiple measurements were recorded on the same day for a given participant, the line passes through the average titer for that day, while all individual observations are shown as points. Panels are stratified by dose group and antibody type. Antibody titers are displayed on a logarithmic scale. Censored observations are indicated by triangular points plotted at the limit of detection.
+
+```{r fig-ni-spaghetti, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/spaghetti-plots/spaghetti-plot-ni.png"))
+```
+
+```{r fig-nv-spaghetti, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/spaghetti-plots/spaghetti-plot-nv.png"))
+```
+
+### Comparison of antibody levels across dose groups
+
+@tbl-ni-dose-median-iqr-1 - @tbl-nv-dose-median-iqr-5 summarize antibody levels across dose groups at each study time point. Values are presented as median (interquartile range [IQR]) to illustrate the magnitude and variability of antibody responses across dose groups.
+
+```{r}
+#| label: tbl-ni-dose-median-iqr-1
+readRDS(here::here("results/tables/dose-median-iqr/tab-ni-dose-median-iqr-GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-dose-median-iqr-2
+readRDS(here::here("results/tables/dose-median-iqr/tab-ni-dose-median-iqr-GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-dose-median-iqr-3
+readRDS(here::here("results/tables/dose-median-iqr/tab-ni-dose-median-iqr-GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-dose-median-iqr-1
+readRDS(here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-dose-median-iqr-2
+readRDS(here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-dose-median-iqr-3
+readRDS(here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-dose-median-iqr-4
+readRDS(here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-GII.4_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-dose-median-iqr-5
+readRDS(here::here("results/tables/dose-median-iqr/tab-nv-dose-median-iqr-GII.4_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+## Model evaluation
+
+### Diagnostics
+
+Model diagnostics were assessed for all fitted exponential and power-law models. Summary diagnostic tables, including posterior parameter estimates, uncertainty intervals, and convergence diagnostics, are provided in @tbl-ni-diagnostics-exp-1 through @tbl-nv-diagnostics-pow-5.
+
+```{r}
+#| label: tbl-ni-diagnostics-exp-1
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_exp_GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-diagnostics-exp-2
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_exp_GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-diagnostics-exp-3
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_exp_GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-diagnostics-pow-1
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_pow_GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-diagnostics-pow-2
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_pow_GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-diagnostics-pow-3
+readRDS(here::here("results/tables/model-diagnostics/tab-NI_pow_GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-exp-1
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_exp_GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-exp-2
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_exp_GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-exp-3
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_exp_GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-exp-4
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_exp_GII.4_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-exp-5
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_exp_GII.4_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-pow-1
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_pow_GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-pow-2
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_pow_GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-pow-3
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_pow_GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-pow-4
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_pow_GII.4_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-diagnostics-pow-5
+readRDS(here::here("results/tables/model-diagnostics/tab-NV_pow_GII.4_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+Markov chain trace plots are shown in @fig-trace-ni-exp-1 through @fig-trace-nv-pow-5. Trace plots indicated good chain mixing and no evidence of non-convergence. Some parameters exhibited greater posterior variability, likely reflecting limited information from sparse data.
+
+```{r fig-trace-ni-exp-1, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_exp_GI.1_HBGA.png"))
+```
+
+```{r fig-trace-ni-exp-2, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_exp_GI.1_IgA.png"))
+```
+
+```{r fig-trace-ni-exp-3, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_exp_GI.1_IgG.png"))
+```
+
+```{r fig-trace-ni-pow-1, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_pow_GI.1_HBGA.png"))
+```
+
+```{r fig-trace-ni-pow-2, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_pow_GI.1_IgA.png"))
+```
+
+```{r fig-trace-ni-pow-3, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NI_pow_GI.1_IgG.png"))
+```
+
+```{r fig-trace-nv-exp-1, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_exp_GI.1_HBGA.png"))
+```
+
+```{r fig-trace-nv-exp-2, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_exp_GI.1_IgA.png"))
+```
+
+```{r fig-trace-nv-exp-3, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_exp_GI.1_IgG.png"))
+```
+
+```{r fig-trace-nv-exp-4, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_exp_GII.4_IgA.png"))
+```
+
+```{r fig-trace-nv-exp-5, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_exp_GII.4_IgG.png"))
+```
+
+```{r fig-trace-nv-pow-1, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_pow_GI.1_HBGA.png"))
+```
+
+```{r fig-trace-nv-pow-2, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_pow_GI.1_IgA.png"))
+```
+
+```{r fig-trace-nv-pow-3, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_pow_GI.1_IgG.png"))
+```
+
+```{r fig-trace-nv-pow-4, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_pow_GII.4_IgA.png"))
+```
+
+```{r fig-trace-nv-pow-5, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/trace-plots/NV_pow_GII.4_IgG.png"))
+```
+
+### Model trajectories on the linear scale
+
+To complement the log-scale trajectory plots presented in the main manuscript, @fig-ni-trajectory-linear and @fig-nv-trajectory-linear show the exponential and power-law model trajectories on the linear antibody scale for the NI and NV studies, respectively. These plots provide a direct visualization of the absolute magnitude of antibody decline over time. In addition, @tbl-ni-percent-antibody-loss and @tbl-nv-percent-antibody-loss summarize the percentage of antibody loss from the model-estimated peak response to 365 days post-exposure or post-vaccination, respectively, for each model.
+
+```{r fig-ni-trajectory-linear, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/linear-trajectory-plots/plot-ni-model-trajectories-linear.png"))
+```
+
+```{r fig-nv-trajectory-linear, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/linear-trajectory-plots/plot-nv-model-trajectories-linear.png"))
+```
+
+```{r}
+#| label: tbl-ni-percent-antibody-loss
+readRDS(here::here("results/tables/percent-antibody-loss/tab-ni-percent-loss.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-percent-antibody-loss
+readRDS(here::here("results/tables/percent-antibody-loss/tab-nv-percent-loss.rds")) |>
+  fit_flextable_to_page()
+```
+
+## Individual-level antibody kinetics
+
+### Random effects
+
+@fig-ni-exp-random-effects - @fig-nv-pow-random-effects summarize individual-level heterogeneity in antibody kinetics captured by the hierarchical model. The distributions show subject-specific deviations from population-level kinetic parameter estimates on the latent parameter scale for each nonlinear parameter, including response magnitude (p), growth rate (g), time to peak (k), and decay parameter (d), stratified by study and model. Corresponding posterior summaries of the random-effect standard deviations are provided in @tbl-ni-exp-random-effect-sd - @tbl-nv-pow-random-effect-sd.
+
+```{r fig-ni-exp-random-effects, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/random-effects/NI_Exponential_random_effects.png"))
+```
+
+```{r fig-ni-pow-random-effects, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/random-effects/NI_Power-law_random_effects.png"))
+```
+
+```{r fig-nv-exp-random-effects, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/random-effects/NV_Exponential_random_effects.png"))
+```
+
+```{r fig-nv-pow-random-effects, echo=FALSE}
+knitr::include_graphics(here::here("results/figures/supplement/random-effects/NV_Power-law_random_effects.png"))
+```
+
+```{r}
+#| label: tbl-ni-exp-random-effect-sd
+readRDS(here::here("results/tables/random-effect-sd/tab-NI-Exponential-random-effect-SD.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-ni-pow-random-effect-sd
+readRDS(here::here("results/tables/random-effect-sd/tab-NI-Power-law-random-effect-SD.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-exp-random-effect-sd
+readRDS(here::here("results/tables/random-effect-sd/tab-NV-Exponential-random-effect-SD.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-pow-random-effect-sd
+readRDS(here::here("results/tables/random-effect-sd/tab-NV-Power-law-random-effect-SD.rds")) |>
+  fit_flextable_to_page()
+```
+
+### Individual-level model-predicted trajectories
 
 @fig-id-ni-model-1 through @fig-id-ni-model-3 show individual-level model trajectories alongside observed data from the NI study, while @fig-id-nv-model-1 through @fig-id-nv-model-5 show the corresponding trajectories for the NV study. Censored observations are indicated by triangular points plotted at the limit of detection.
 
@@ -633,47 +937,14 @@ knitr::include_graphics(here::here("results/figures/supplement/id-model-trajecto
 knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/GII.4 IgG.png"))
 ```
 
-### NV individual peak titers
+## Dose-associated differences in antibody kinetics
 
-The vaccine in the NV study used a two-dose vaccination regimen, with the second dose administered 28 days after the first dose. We initially hypothesized that antibody kinetics in the NV study would exhibit a distinct secondary growth phase or delayed peak following the booster dose. However, this pattern was not supported by the data. @fig-id-nv-model-zoom-1 to @fig-id-nv-model-zoom-5 show individual-level antibody trajectories from the NV study, showing observed data zoomed into the first 60 days post-vaccination. Day 28, corresponding to the second dose, is indicated by a dashed vertical line, and the observed peak titer for each individual is marked with a solid black point.
-
-Visual inspection suggests that the majority of individuals reached their peak antibody titers before the second dose was administered. There was no consistent evidence of waning after the initial peak followed by a secondary rise after the booster dose. Because antibody kinetics in the NV study closely resembled those observed in the NI study, we applied the same model structure to both datasets. To allow for the possibility of delayed peak responses, wide priors were specified on the inflection point parameter ($K$), enabling the model to accommodate peaks occurring after the second dose if supported by the data.
-
-It remains plausible that the second dose helps maintain antibody levels that might otherwise decline in its absence. Such an effect would be captured in the current model via the decay parameter ($D$), rather than through the emergence of a distinct secondary peak. Alternatively, it may indicate the need for a more flexible modeling approach in which the decay rate is allowed to vary over time, as in the power-law decay model, rather than assuming a constant exponential decline.
-
-```{r fig-id-nv-model-zoom-1, echo=FALSE}
-#| out-width: 90%
-knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/zoom/GI.1 HBGA.png"))
-```
-
-```{r fig-id-nv-model-zoom-2, echo=FALSE}
-#| out-width: 90%
-knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/zoom/GI.1 IgA.png"))
-```
-
-```{r fig-id-nv-model-zoom-3, echo=FALSE}
-#| out-width: 90%
-knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/zoom/GI.1 IgG.png"))
-```
-
-```{r fig-id-nv-model-zoom-4, echo=FALSE}
-#| out-width: 90%
-knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/zoom/GII.4 IgA.png"))
-```
-
-```{r fig-id-nv-model-zoom-5, echo=FALSE}
-#| out-width: 90%
-knitr::include_graphics(here::here("results/figures/supplement/id-model-trajectories/nv/zoom/GII.4 IgG.png"))
-```
-
-## Posterior probabilities of dose-dependent differences
+### Posterior probabilities of dose-associated differences
 
 @fig-ni-pow-measure-probabilities and @fig-nv-pow-measure-probabilities present heatmaps of posterior probabilities that the kinetic measure at one dose exceeded that at another, for all pairwise dose combinations, antibody types, and measures. Probabilities are shown for one direction of each dose pair; the reverse probability is its complement.
 
 ```{r}
 #| label: fig-ni-pow-measure-probabilities
-#| fig-cap: |
-#|   [Posterior probabilities of pairwise dose differences in antibody kinetic measures following norovirus infection. Heatmaps show the posterior probability that the kinetic measure (rows) at one dose exceeded that at another (columns) for each antibody type. Probabilities are shown for one direction of each pair; the complement gives the reverse.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -684,8 +955,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-pow-measure-probabilities
-#| fig-cap: |
-#|   [Posterior probabilities of pairwise dose differences in antibody kinetic measures following norovirus vaccination. Heatmaps show the posterior probability that the kinetic measure (rows) at one dose exceeded that at another (columns) for each antibody type. Probabilities are shown for one direction of each pair; the complement gives the reverse.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -694,16 +963,54 @@ knitr::include_graphics(
 )
 ```
 
+### Area under antibody trajectory
+
+As a complementary summary of antibody kinetics, we calculated the area under the model-estimated antibody trajectory (AUC) from day 0 to one year after infection or vaccination. The AUC summarizes cumulative antibody levels over the first year and therefore reflects the combined effects of antibody induction and subsequent waning. For each posterior draw, the AUC was calculated using the trapezoidal rule. Predicted antibody levels below 1 were truncated to 1 prior to integration to avoid values below the assumed baseline. Posterior median AUCs and 95% credible intervals are shown alongside peak response, decay rate, and one-year response in @fig-auc-ni and @fig-auc-nv.
+
+```{r}
+#| label: fig-auc-ni
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/supplement/plot-measures-auc/plot-ni-measures-auc.png")
+)
+```
+
+```{r}
+#| label: fig-auc-nv
+#| echo: false
+#| results: asis
+knitr::include_graphics(
+	here::here("results/figures/supplement/plot-measures-auc/plot-nv-measures-auc.png")
+)
+```
+
+### IgA-to-IgG response ratios
+
+To evaluate whether exposure type or dose influenced the relative induction of IgA and IgG responses, we calculated the ratio of model-estimated peak IgA response to peak IgG response for each dose group (@tbl-ni-iga-igg - @tbl-nv-iga-igg). Ratios were calculated using posterior draws from the group-level model estimates and summarized as posterior medians with 95% credible intervals. Ratios greater than 1 indicate a greater modeled peak IgA response relative to IgG, whereas ratios less than 1 indicate a greater modeled peak IgG response relative to IgA. Results are presented separately for the NI and NV studies, with GI.1 and GII.4 responses evaluated where available.
+
+Across both studies, model-estimated peak IgA:IgG response ratios were generally greater than 1, indicating modestly larger peak IgA than IgG responses, with little evidence of consistent dose-dependent differences.
+
+```{r}
+#| label: tbl-ni-iga-igg
+readRDS(here::here("results/tables/iga-igg-ratios/tab-ni-iga-igg.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-iga-igg
+readRDS(here::here("results/tables/iga-igg-ratios/tab-nv-iga-igg.rds")) |>
+  fit_flextable_to_page()
+```
+
 ## Predictors of long-lasting antibody response
 
 ### GII.4 results
 
-@fig-pow-gii4-measures-vs illustrates the relationships between antibody kinetic measures (growth rate, peak response, and decay rate) and predicted response at one year for GII.4 antibodies in the NV study, as shown in Figure 5 of the main text. @fig-pow-gii4-peak-decay-1year shows the joint relationship between peak response, decay rate, and predicted response at one year for GII.4 antibodies, as shown in Figure 6 of the main text.
+@fig-pow-gii4-measures-vs illustrates the relationships between antibody kinetic measures (growth rate, peak response, and decay rate) and model-estimated response at one year for GII.4 antibodies in the NV study, analogous to Figure 5 of the main text. @fig-pow-gii4-peak-decay-1year shows the joint relationship between peak response, decay rate, and predicted response at one year for GII.4 antibodies, analogous to Figure 6 of the main text.
 
 ```{r}
 #| label: fig-pow-gii4-measures-vs
-#| fig-cap: |
-#|   [Model-predicted GII.4 antibody kinetic measures by dose and antibody. Growth rate (per day), peak response, and decay rate (per day; evaluated at day 90) are plotted against predicted response at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Color and shape indicate dose. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -714,8 +1021,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-pow-gii4-peak-decay-1year
-#| fig-cap: |
-#|   [Joint relationships of GII.4 antibody peak response, decay rate (per day; evaluated at day 90), and predicted response at one year. Panel A shows peak response versus decay rate, with dose-specific points indicated by shape and color. Panel B shows the same relationship but with color representing predicted antibody response at one year, using antibody-specific color scales shown underneath their respective plot. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -726,79 +1031,128 @@ knitr::include_graphics(
 
 ### Overall correlations
 
+Spearman rank correlations across all posterior draws are reported in @tbl-cor-overall. Correlations are shown between growth rate and model-estimated one-year response, peak response and model-estimated one-year response, decay rate (evaluated at day 90) and model-estimated one-year response, peak response and growth rate, and peak response and decay rate. Correlations were computed across all posterior draws irrespective of dose group and are reported separately for each antibody type.
+
 ```{r}
 #| label: tbl-cor-overall
-#| tbl-cap: "Spearman rank correlations between antibody kinetic measures across all posterior draws. Correlations are shown between: growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across all posterior draws regardless of dose group, for each antibody type."
-
 readRDS(here::here("results/tables/correlations/overall/tab-cor-overall.rds")) |>
   fit_flextable_to_page()
 ```
 
 ### Within-dose correlations
 
+Spearman rank correlations computed within each dose group are reported in @tbl-ni-gI1-hbga-cor through @tbl-nv-gII4-igg-cor. For each dose group, correlations are shown between growth rate and model-estimated one-year response, peak response and model-estimated one-year response, decay rate (evaluated at day 90) and model-estimated one-year response, peak response and growth rate, and peak response and decay rate.
+
 ```{r}
 #| label: tbl-ni-gI1-hbga-cor
-#| tbl-cap: "NI GI.1 HBGA: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NI_GI_1_HBGA.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-gI1-iga-cor
-#| tbl-cap: "NI GI.1 IgA: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NI_GI_1_IgA.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-ni-gI1-igg-cor
-#| tbl-cap: "NI GI.1 IgG: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NI_GI_1_IgG.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-gI1-hbga-cor
-#| tbl-cap: "NV GI.1 HBGA: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GI_1_HBGA.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-gI1-iga-cor
-#| tbl-cap: "NV GI.1 IgA: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GI_1_IgA.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-gI1-igg-cor
-#| tbl-cap: "NV GI.1 IgG: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GI_1_IgG.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-gII4-iga-cor
-#| tbl-cap: "NV GII.4 IgA: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GII_4_IgA.rds")) |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: tbl-nv-gII4-igg-cor
-#| tbl-cap: "NV GII.4 IgG: Spearman rank correlations between antibody kinetic measures within dose groups. For each dose group, correlations are shown between growth rate and one-year response, peak response and one-year response, decay rate (at day 90) and one-year response, peak response and growth rate, and peak response and decay rate. Correlations are computed across posterior draws within each dose group, with each column corresponding to a dose."
-
 readRDS(here::here("results/tables/correlations/dose/tab-cor-dose_NV_GII_4_IgG.rds")) |>
   fit_flextable_to_page()
 ```
+
+## Additional antibody response analyses
+
+### Evaluation of antibody responses following second vaccine dose
+
+The NV study used a two-dose vaccination regimen, with the second dose administered 28 days after the first dose. To evaluate whether the booster dose was associated with a secondary increase in antibody responses, we performed two complementary analyses. First, among participants with both day 28 and day 35 measurements, we compared antibody levels before and after booster administration. For participants with replicate day 35 measurements, an increase was defined as any day 35 measurement exceeding the corresponding day 28 measurement. Second, we identified the timing of each participant's maximum observed antibody measurement to determine whether peak responses consistently occurred after booster administration.
+
+Across antibody types and dose groups, some individual antibody levels increased following the second dose (@tbl-nv-second-dose), but most participants reached their maximum observed antibody response before booster administration (@tbl-nv-peak-1 - @tbl-nv-peak-5). Neither analysis demonstrated a consistent pattern across antibody types, individuals, or dose groups, nor did they support the presence of a consistent population-level secondary peak following booster vaccination.
+
+Additional zoomed-in versions of the individual trajectory plots (@fig-id-nv-model-1 to @fig-id-nv-model-5), focusing on the first 60 days following initial vaccination and denoting day 28 (booster administration) and the maximum observed antibody response, were generated for visual inspection and are available in the GitHub repository.
+
+```{r}
+#| label: tbl-nv-second-dose
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-second-dose.rds")) |>
+  fit_flextable_to_page()
+```
+
+
+```{r}
+#| label: tbl-nv-peak-1
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-peak-GI.1_HBGA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-peak-2
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-peak-GI.1_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-peak-3
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-peak-GI.1_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-peak-4
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-peak-GII.4_IgA.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-nv-peak-5
+#| tbl-cap: ""
+
+readRDS(here::here("results/tables/nv-second-dose/tab-nv-peak-GII.4_IgG.rds")) |>
+  fit_flextable_to_page()
+```
+
+Given the limited sample sizes and sparse sampling around booster administration, we considered a more complex model incorporating a distinct booster-associated peak to be insufficiently identifiable. We therefore applied the same single-peak model structure to both the NV and NI studies. The model allowed for peak responses to occur after the second dose through the inflection point parameter ($K$), when supported by the data. As a sensitivity analysis, we repeated the analyses using a prior on $K$ centered at a median time-to-peak of 30 days. This alternative prior produced qualitatively similar posterior estimates and did not change the study conclusions (@fig-prior-sens-7 - @fig-prior-sens-16).
+
+These analyses do not exclude the possibility that the second dose influenced antibody maintenance or subsequent waning without producing a distinct secondary peak. Such effects could be partially reflected through the estimated decay parameter ($D$). Denser sampling around booster administration would be required to evaluate models that explicitly represent booster-associated changes in antibody induction and waning.
 
 ## Exponential-decay model results
 
@@ -806,8 +1160,6 @@ The @fig-ni-exp-measures to @fig-exp-peak-decay-1year correspond to Figures 2-6 
 
 ```{r}
 #| label: fig-ni-exp-measures
-#| fig-cap: |
-#|   [Exponential decay model-derived antibody kinetic measures following norovirus infection by challenge dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scales for growth rate and peak time were truncated. The upper bounds of the 95% CIs for GI.1 HBGA growth rate at doses 4.8 and 48 were 1.91 and 1.87, respectively. The upper bound of the GI.1 HBGA 4800 time of peak CI was 37 days.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -817,8 +1169,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-exp-measures
-#| fig-cap: |
-#|   [Exponential decay model-derived antibody kinetic measures following norovirus vaccination by assigned dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scale for peak time was truncated. The upper bound of the 95% CI for GII.4 IgA peak time at the 150 dose was 24 days. For GII.4 IgG, the upper bounds for the 5, 15, and 150 doses were 31, 19.5, and 36 days, respectively.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -828,8 +1178,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-exp-measures-vs
-#| fig-cap: |
-#|   [Exponential decay model-predicted antibody kinetic measures by study, dose, and antibody. Growth rate (per day), peak response, and decay rate (per day) are plotted against predicted response at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after removing the upper and lower 5% of draws for each measure. Color and shape indicate study and dose, with triangle variations for the NI study and square variations for the NV study. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are shown below.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -839,8 +1187,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-exp-peak-decay-1year
-#| fig-cap: |
-#|   [Joint relationships of peak response, decay rate (per day), and predicted response at one year. Panel A shows peak response versus decay rate, with study- and dose-specific points indicated by shape and color. Panel B shows the same relationship but with color representing predicted antibody response at one year, using antibody-specific color scales shown underneath their respective plot. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after removing the upper and lower 5% of draws. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are shown below.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -850,8 +1196,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-exp-gii4-measures-vs
-#| fig-cap: |
-#|   [Exponential model-predicted GII.4 antibody kinetic measures by study, dose, and antibody. Growth rate (per day), peak response, and decay rate (per day) are plotted against predicted response at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Color and shape indicate dose. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -862,8 +1206,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-exp-gii4-peak-decay-1year
-#| fig-cap: |
-#|   [Joint relationships of GII.4 antibody peak response, decay rate (per day), and predicted response at one year. Panel A shows peak response versus decay rate, with dose-specific points indicated by shape and color. Panel B shows the same relationship but with color representing predicted antibody response at one year, using antibody-specific color scales shown underneath their respective plot. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -872,20 +1214,130 @@ knitr::include_graphics(
 )
 ```
 
-## Sensitivity analysis of censoring bounds
+## Sensitivity analyses
 
-To account for censoring, observations below the assay’s lower limit of detection were treated as interval-censored. On the linear scale, the natural lower bound would be zero, but because antibody levels are modeled on a natural log scale, ln(0) is undefined. In the main analysis, we arbitrarily set a lower bound of $10^{-6}$ 
+### Prior sensitivity analysis
+
+To assess sensitivity to prior specification, we repeated all analyses using broader prior distributions. We doubled the prior standard deviations for the $p$, $g$, $k$, and $d$ parameters. For the inflection point parameter, $k$, we centered the broader prior at $\log(30)$ to test whether the distribution converged to an inflection point corresponding to approximately 30 days after exposure (@fig-prior-sens-1 - @fig-prior-sens-16). This was of interest because of the two-dose vaccination regimen in the NV study, where the second vaccine was administered 28 days after the first. Some quantitative differences were observed for growth rate and time-to-peak estimates and credible intervals in the NI GI.1 HBGA-blocking models and several NV exponential models (@tbl-prior-sens-1 - @tbl-prior-sens-16). @fig-ni-measures-prior-sens and @fig-nv-measures-prior-sens show the model-estimated kinetic measures under models fit with these prior specifications, analogous to the dose-associated measures in the main text. These figures show that the differences were consistent across dose groups and did not alter the relative comparisons among doses or the overall interpretation of the results. 
+
+```{r}
+#| label: tbl-prior-sens-1
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_HBGA-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-2
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_IgA-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-3
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_IgG-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-4
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_HBGA-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-5
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_IgA-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-6
+readRDS(here::here("results/tables/prior-sensitivity/tab-NI-GI.1_IgG-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-7
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_HBGA-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-8
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_IgA-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-9
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_IgG-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-10
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GII.4_IgA-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-11
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GII.4_IgG-Exponential.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-12
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_HBGA-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-13
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_IgA-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-14
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GI.1_IgG-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-15
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GII.4_IgA-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: tbl-prior-sens-16
+readRDS(here::here("results/tables/prior-sensitivity/tab-NV-GII.4_IgG-Power-law.rds")) |>
+  fit_flextable_to_page()
+```
+
+```{r}
+#| label: fig-ni-measures-prior-sens
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/plot-ni-measures.png"))
+```
+
+```{r}
+#| label: fig-nv-measures-prior-sens
+knitr::include_graphics(here::here("results/figures/supplement/prior-sensitivity/plot-nv-measures.png"))
+```
+
+### Censoring bounds
+
+To account for censoring, observations below the assay’s lower limit of detection were treated as interval-censored. On the linear scale, the natural lower bound would be zero, but because antibody levels are modeled on a natural log scale, log(0) is undefined. In the main analysis, we arbitrarily set a lower bound of $10^{-6}$ 
 
 To assess the sensitivity of this choice, we performed additional analyses using a larger lower bound of $10^{-2}$ and a smaller lower bound of $10^{-14}$.
 
-### Larger lower bound ($10^{-2}$)
+#### Larger lower bound ($10^{-2}$)
 
 The following table and figures correspond to Table 1 and Figures 2-4 in the main text, but were generated using a lower censoring bound of $10^{-2}$ for interval-censored observations (i.e., observations below the limit of detection).
 
 ```{r}
 #| label: fig-ni-outcome-alt1
-#| fig-cap: |
-#|   [Data and fitted antibody kinetics in the Norovirus Infection (NI) study, by dose group and antibody type. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -895,8 +1347,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-outcome-alt1
-#| fig-cap: |
-#|   [Data and fitted antibody kinetics in the Norovirus Vaccination (NV) study, by dose group and antibody type. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -906,17 +1356,13 @@ knitr::include_graphics(
 
 ```{r}
 #| label: tbl-bound-increase
-#| tbl-cap: "Model comparison metrics for exponential and power-law decay models by study and antibody. Expected log predictive density (ELPD) represents predictive performance, where higher values indicate better fit, and ELPD SE is its standard error."
-
 readRDS(here::here("results/tables/cens-bound-sensitivity/increase/tab-model-metrics.rds")) |>
-  fontsize(size = 8, part = "all") |>
+  fontsize(size = 12, part = "all") |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: fig-ni-measures-alt1
-#| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus infection by challenge dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day; evaluated at day 90), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scales for growth rate was truncated. The upper bounds of the 95% CIs for GI.1 HBGA growth rate at doses 4.8, 48, and 4800 were 2.48, 1.85, and 1.15, respectively.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -926,8 +1372,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-measures-alt1
-#| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus vaccination by assigned dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day; evaluated at day 90), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scale for growth rate was truncated. The upper bounds of the 95% CIs for GI.1 IgA growth rate at the 50 and 150 doses were 4.59 and 4.54, respectively. For GII.4 IgA, the corresponding upper bounds were 4.19 and 5.20.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -935,14 +1379,12 @@ knitr::include_graphics(
 )
 ```
 
-### Smaller lower bound ($10^{-14}$)
+#### Smaller lower bound ($10^{-14}$)
 
 The following figures and table correspond to Figures 2-4 and Table 1 in the main text, but were generated using a lower censoring bound of $10^{-14}$ for interval-censored observations (i.e., observations below the limit of detection).
 
 ```{r}
 #| label: fig-ni-outcome-alt2
-#| fig-cap: |
-#|   [Data and fitted antibody kinetics in the Norovirus Infection (NI) study, by dose group and antibody type. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -952,8 +1394,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-outcome-alt2
-#| fig-cap: |
-#|   [Data and fitted antibody kinetics in the Norovirus Vaccination (NV) study, by dose group and antibody type. Orange solid lines represent the exponential decay model, and blue dashed lines represent the power-law decay model. Ninety-five percent credible intervals based on the median and median absolute deviation are shown as ribbons around the trajectories. Points represent the observed data, and censored observations are denoted with triangles plotted at the limit of detection.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -963,17 +1403,13 @@ knitr::include_graphics(
 
 ```{r}
 #| label: tbl-bound-decrease
-#| tbl-cap: "Model comparison metrics for exponential and power-law decay models by study and antibody. Expected log predictive density (ELPD) represents predictive performance, where higher values indicate better fit, and ELPD SE is its standard error."
-
 readRDS(here::here("results/tables/cens-bound-sensitivity/decrease/tab-model-metrics.rds")) |>
-  fontsize(size = 8, part = "all") |>
+  fontsize(size = 12, part = "all") |>
   fit_flextable_to_page()
 ```
 
 ```{r}
 #| label: fig-ni-measures-alt2
-#| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus infection by challenge dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day; evaluated at day 90), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scales for growth rate was truncated. The upper bounds of the 95% CIs for GI.1 HBGA growth rate at doses 4.8, 48, and 4800 were 2.80, 2.01, and 1.66, respectively.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -983,8 +1419,6 @@ knitr::include_graphics(
 
 ```{r}
 #| label: fig-nv-measures-alt2
-#| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus vaccination by assigned dose. Growth rate (per day), peak response, time of peak (days) , decay rate (per day; evaluated at day 90), and predicted response at one year are shown, with rows corresponding to kinetic measure and columns corresponding to antibody type. Solid points denote population-level posterior estimates, with vertical lines indicating 95% equal-tailed credible intervals (CIs). For visualization purposes, the y-axis scale for growth rate was truncated. The upper bounds of the 95% CIs for GI.1 IgA growth rate at the 50 and 150 doses were 4.69 and 4.86, respectively. For GII.4 IgA, the corresponding upper bounds were 5.55 and 4.41.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -992,14 +1426,18 @@ knitr::include_graphics(
 )
 ```
 
-## Sensitivity analysis of decay rate calculation
+### Decay calculation
 
-The power-law model assumes that antibody waning slows over time, so decay rate is inherently time-dependent. In the main text, we report decay rates calculated at day 90, defined as the rate of change from day 89 to day 90. As a sensitivity analysis, we also calculated decay rates at days 60, 180, and 365. The following figures present these additional estimates in the same context as the day-90 decay rates to evaluate whether the choice of time point influences the interpretation of antibody kinetics.
+The power-law model assumes that antibody waning slows over time, so decay rate is time-dependent. In the main text, we report decay rates evaluated at day 90, defined as the instantaneous rate of change at day 90. As a sensitivity analysis, we also evaluated decay rates at days 60, 180, and 365 to assess whether the choice of evaluation time influenced the interpretation of antibody kinetics.
+
+@fig-ni-pow-decay-days and @fig-nv-pow-decay-days show model-estimated decay rates at days 60, 90, 180, and 365 for the NI and NV studies, respectively. Across all time points, the qualitative patterns were unchanged. Dose-group ordering, relative differences among antibody types, and the overall interpretation of antibody waning remained consistent regardless of the evaluation day.
+
+@fig-peak-decay-days-1year examines the joint relationship between peak response, decay rate, and model-estimated one-year response using decay rates evaluated at days 60, 180, and 365. Similar to the day-90 analyses presented in the main text, higher peak responses across dose groups tended to be accompanied by faster decay, whereas within dose groups peak response and decay rate remained largely independent. Consequently, the interpretation of the relationship between early antibody kinetics and long-term persistence was not sensitive to the specific time point used to summarize the power-law decay rate.
 
 ```{r}
 #| label: fig-ni-pow-decay-days
 #| fig-cap: |
-#|   [Power-law model-derived antibody decay rates calculated at days 60, 90, 180, and 365 following norovirus infection by challenge dose. Rows correspond to measures and columns correspond to antibody type. Solid points represent population-level posterior estimates, with vertical lines indicating 95% CIs.]{color="#FF2400"}
+#|   [Power-law model-estimated antibody decay rates evaluated at days 60, 90, 180, and 365 following norovirus infection.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1010,7 +1448,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-nv-pow-decay-days
 #| fig-cap: |
-#|   [Power-law model-derived antibody decay rates calculated at days 60, 90, 180, and 365 following norovirus vaccination by dose. Rows correspond to measures and columns correspond to antibody type. Solid points represent population-level posterior estimates, with vertical lines indicating 95% CIs.]{color="#FF2400"}
+#|   [Power-law model-estimated antibody decay rates evaluated at days 60, 90, 180, and 365 following norovirus vaccination.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1021,7 +1459,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-peak-decay-days-1year
 #| fig-cap: |
-#|   [Joint relationships of peak response, decay rate, and predicted response at one year are shown with decay calculated at days 60 (Panel A), 180 (Panel B), and 365 (Panel C). All panels plot peak response versus decay rate, with study- and dose-specific points indicated by shape. Color represents predicted antibody response at one year, using antibody-specific color scales shown in panel order. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Only GI.1 antibodies are shown.]{color="#FF2400"}
+#|   [Joint relationships between peak response, decay rate, and model-estimated one-year response using decay rates evaluated at days 60 (A), 180 (B), and 365 (C).]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1029,22 +1467,22 @@ knitr::include_graphics(
 )
 ```
 
-## Sensitivity analysis of antibody kinetics relative to baseline
+### Baseline normalization
 
-@fig-ni-pow-measures-absolute and @fig-nv-pow-measures-absolute present peak and predicted one-year titers as kinetic measures, in the same context as Figures 3 and 4 of the main text, to assess the impact of baseline antibody levels on post-challenge or post-vaccination response kinetics. @fig-absolute-measures-vs and @fig-absolute-peak-decay-1year examine these measures within the same framework as Figures 5 and 6 of the main text. @fig-pow-gii4-absolute-measures-vs and @fig-pow-gii4-absolute-peak-decay-1year are analogous to @fig-pow-gii4-measures-vs and @fig-pow-gii4-peak-decay-1year but consider absolute measures.
+@fig-ni-pow-measures-absolute and @fig-nv-pow-measures-absolute compare model-estimated antibody kinetics expressed relative to baseline (as presented in the main text) with the corresponding absolute antibody titers for the NI and NV studies, respectively. Measures include baseline titer, peak titer, peak response, predicted one-year titer, and predicted one-year response. @fig-absolute-measures-vs and @fig-absolute-peak-decay-1year examine the relationships between growth rate, peak titer, decay rate, and predicted one-year titer using the same framework as Figures 5 and 6 of the main text. Corresponding analyses for GII.4 antibodies are shown in @fig-pow-gii4-absolute-measures-vs and @fig-pow-gii4-absolute-peak-decay-1year.
 
-In the NI study, baseline titers were generally balanced across dose groups for GI.1 HBGA, though the 4800 dose group had slightly lower IgA and IgG baselines. Peak response for HBGA decreased slightly with increasing dose, and this pattern was more pronounced when examining peak titers. Although the 4800 dose produced the largest IgA peak response, it had the smallest estimated peak titer. Similarly, while the 4800 dose had the largest predicted one-year response, absolute one-year titers were comparable across doses. IgG peak responses were similar across doses, but peak titers for the 4800 dose were lower than the other doses. These differences did not meaningfully affect one-year outcomes, as both response-based and absolute titers were similar across doses.
+In the NI study, baseline titers were generally similar across challenge doses for GI.1 HBGA-blocking antibodies, although the 4800 dose group had slightly lower IgA and IgG baselines. Peak HBGA-blocking responses decreased modestly with increasing dose, and this pattern became more apparent when examining absolute peak titers. Although the 4800 dose produced the largest IgA peak response, it had the smallest estimated peak titer. Likewise, although the 4800 dose produced the largest predicted one-year response, absolute one-year titers were similar across dose groups. IgG peak responses were similar across doses, but absolute peak titers for the 4800 dose were lower than those of the other groups. Overall, baseline normalization had little influence on the interpretation of one-year antibody levels.
 
-In the NV study, 50 and 150 doses had lower baseline GI.1 IgA, GII.4 IgA, and GII.4 IgG titers than the 5 and 15 doses. Although peak response and peak titer were qualitatively similar across doses, the 50 dose produced the largest one-year response but the smallest absolute one-year titer for these antibodies, again reflecting baseline differences.
+In the NV study, the 50 and 150 doses had lower baseline GI.1 IgA, GII.4 IgA, and GII.4 IgG titers than the 5 and 15 doses. Peak responses and peak titers showed similar qualitative dose patterns. However, for several antibodies, the 50 dose produced the largest predicted one-year response but among the lowest absolute predicted one-year titers, reflecting differences in baseline antibody levels rather than post-vaccination kinetics.
 
-Across studies, GI.1 baseline titers were comparable between infection and vaccination groups. NI groups showed slightly higher one-year HBGA responses than NV groups, particularly when we considered absolute titers. Importantly, absolute titers did not alter the relationships among growth, peak, decay, and one-year response: growth remained unassociated, peak remained positively associated, and decay remained negatively associated. Peak titer also remained positively associated with decay rate, highlighting the coupling between peak magnitude, waning, and one-year titers. In some dose groups, lower peak titers combined with slower waning resulted in comparatively higher one-year titers.
+Across studies, GI.1 baseline titers were broadly comparable between the infection and vaccination cohorts. NI participants generally maintained higher HBGA-blocking antibody titers at one year than NV participants, particularly when we considered absolute titers. Importantly, using absolute titers rather than baseline-relative responses did not change the relationships among kinetic measures. Growth rate remained weakly associated with one-year titers, peak titer remained positively associated, and decay rate remained negatively associated. Peak titer also remained positively associated with decay rate across dose groups, indicating that larger peak responses were generally accompanied by faster waning. In some dose groups, lower peak titers combined with slower waning produced comparable or higher one-year titers.
 
-Absolute and baseline-relative measures introduced minor interpretational differences but our primary conclusions remained unchanged. Distinguishing between fold-rise above baseline and absolute antibody titer is important, as these measures reflect different aspects of immune response and potential protection.
+Overall, expressing antibody kinetics as absolute titers rather than responses relative to baseline introduced only minor differences in interpretation and did not change the principal conclusions. Baseline-relative responses quantify the magnitude of the antibody increase following exposure, whereas absolute titers additionally reflect pre-existing immunity.
 
 ```{r}
 #| label: fig-ni-pow-measures-absolute
 #| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus infection by challenge dose. Measures are shown both relative to baseline and on the absolute scale. Rows correspond to kinetic measures (baseline titer, peak titer, peak response relative to baseline, predicted titer at one year, and predicted response relative to baseline), and columns correspond to antibody type. Solid points represent population-level posterior estimates, with vertical lines indicating 95% CIs. The y-axes for baseline, peak titer, and 1-year titer are shown on the log-scale, while the y-axes for peak response and 1-year response are linear.]{color="#FF2400"}
+#|   [Power-law model-estimated antibody kinetic measures following norovirus infection, shown as both absolute titers and responses relative to baseline.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1055,7 +1493,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-nv-pow-measures-absolute
 #| fig-cap: |
-#|   [Power-law model-derived antibody kinetic measures following norovirus vaccination by assigned dose. Measures are shown both relative to baseline and on the absolute scale. Rows correspond to kinetic measures (baseline titer, peak titer, peak response relative to baseline, predicted titer at one year, and predicted response relative to baseline), and columns correspond to antibody type. Solid points represent population-level posterior estimates, with vertical lines indicating 95% CIs. The y-axes for baseline, peak titer, and 1-year titer are shown on the log-scale, while the y-axes for peak response and 1-year response are linear.]{color="#FF2400"}
+#|   [Power-law model-estimated antibody kinetic measures following norovirus vaccination, shown as both absolute titers and responses relative to baseline.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1066,7 +1504,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-absolute-measures-vs
 #| fig-cap: |
-#|   [Model-predicted antibody kinetic measures by study, dose, and antibody. Growth rate (per day), peak titer, and decay rate (per day; evaluated at day 90) are plotted against predicted titer at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Color and shape indicate study and dose, with triangle variations for the NI study and square variations for the NV study. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are shown below.]{color="#FF2400"}
+#|   [Relationships between growth rate, peak titer, decay rate, and predicted one-year titer for GI.1 antibodies.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1077,7 +1515,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-absolute-peak-decay-1year
 #| fig-cap: |
-#|   [Joint relationships of peak titer, decay rate (per day; evaluated at day 90), and predicted titer at one year. Panel A shows peak titer versus decay rate, with study- and dose-specific points indicated by shape and color. Panel B shows the same relationship but with color representing predicted antibody titer at one year, using antibody-specific color scales shown underneath their respective plot. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Only GI.1 antibodies are shown, as these were measured in both studies. GII.4-specific results from the NV study are shown below.]{color="#FF2400"}
+#|   [Joint relationships between peak titer, decay rate, and predicted one-year titer for GI.1 antibodies.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 knitr::include_graphics(
@@ -1088,7 +1526,7 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-pow-gii4-absolute-measures-vs
 #| fig-cap: |
-#|   [Model-predicted GII.4 antibody kinetic measures by study, dose, and antibody. Growth rate (per day), peak titer, and decay rate (per day; evaluated at day 90) are plotted against predicted titer at one year. Larger points represent study- and dose-specific posterior medians, while smaller points show a randomly selected subset of 500 posterior draws per study and dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures. Color and shape indicate dose. For visualization purposes, the growth rate plot is scaled to display only the lower 95% of sampled draws to avoid skewing by extreme values.]{color="#FF2400"}
+#|   [Relationships between growth rate, peak titer, decay rate, and predicted one-year titer for GII.4 antibodies.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
@@ -1100,12 +1538,72 @@ knitr::include_graphics(
 ```{r}
 #| label: fig-pow-gii4-absolute-peak-decay-1year
 #| fig-cap: |
-#|   [Joint relationships of GII.4 antibody peak titer, decay rate (per day; evaluated at day 90), and predicted titer at one year. Panel A shows peak titer versus decay rate, with dose-specific points indicated by shape and color. Panel B shows the same relationship but with color representing predicted antibody titer at one year, using antibody-specific color scales shown underneath their respective plot. Larger points denote posterior medians, while smaller points represent a random subset of 500 posterior draws per dose, sampled after restricting to draws that fall within the 5th to 95th percentile range for all measures.]{color="#FF2400"}
+#|   [Joint relationships between peak titer, decay rate, and predicted one-year titer for GII.4 antibodies.]{color="#FF2400"}
 #| echo: false
 #| results: asis
 #| out-width: 70%
 knitr::include_graphics(
 	here::here("results/figures/supplement/plot-absolute-measures-vs/gii4/plot-gii4-absolute-peak-decay-vs-comb.png")
+)
+```
+
+### Observed kinetic measures
+
+As a sensitivity analysis, we examined pairwise associations among kinetic measures derived directly from the observed antibody measurements, including peak, peak timing, growth rate, decay rate, and final observed response. @fig-ni-obs-peak-final - @fig-nv-obs-peakday-growth show the observed relationships between kinetic measures by antibody and study, with fitted regression lines included to illustrate the direction and strength of potential associations.
+
+```{r}
+#| label: fig-ni-obs-peak-final
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/ni-peak_final.png")
+)
+```
+
+```{r}
+#| label: fig-ni-obs-decay-final
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/ni-decay_final.png")
+)
+```
+
+```{r}
+#| label: fig-ni-obs-peak-decay
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/ni-peak_decay.png")
+)
+```
+
+```{r}
+#| label: fig-ni-obs-peakday-growth
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/ni-peak_day_growth.png")
+)
+```
+
+```{r}
+#| label: fig-nv-obs-peak-final
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/nv-peak_final.png")
+)
+```
+
+```{r}
+#| label: fig-nv-obs-decay-final
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/nv-decay_final.png")
+)
+```
+
+```{r}
+#| label: fig-nv-obs-peak-decay
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/nv-peak_decay.png")
+)
+```
+
+```{r}
+#| label: fig-nv-obs-peakday-growth
+knitr::include_graphics(
+	here::here("results/figures/supplement/obs-measures/nv-peak_day_growth.png")
 )
 ```
 

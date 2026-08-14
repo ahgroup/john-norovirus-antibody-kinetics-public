@@ -163,6 +163,29 @@ func_get_measures_group <- function(data, models, preds) {
         robust = TRUE
       )
       
+      # area under the curev. day 0 to 1 year
+      auc_draws <- numeric(nrow(epred))
+      
+      for (i in seq_len(nrow(epred))) {
+
+        t_auc <- timestamps[timestamps <= 365]
+        y_auc <- epred[i, timestamps <= 365]
+        
+        # cutoff at titer = 1
+        y_auc[y_auc < 1] <- 1
+        
+        # integrate using trapezoidal rule
+        auc_draws[i] <- sum(
+          diff(t_auc) * 
+            (head(y_auc, -1) + tail(y_auc, -1)) / 2
+        )
+      }
+      auc_summary <- posterior_summary(
+        auc_draws,
+        probs = ci_probs,
+        robust = TRUE
+      )
+      
       # store all measures
       measures[[model_name]][[paste0(dose_current)]] <- list(
         min_peak_index = min(peak_index),
@@ -175,6 +198,7 @@ func_get_measures_group <- function(data, models, preds) {
         decay_rate = decay_list,
         titer_1year = titer_1year_summary,
         response_1year = response_1year_summary,
+        auc_peak_1year = auc_summary,
         
         peak_draws = peak_draws,
         growth_draws = growth_draws,
@@ -182,7 +206,8 @@ func_get_measures_group <- function(data, models, preds) {
         peak_response_draws = peak_response_draws,
         decay_rate_draws = decay_draws_list,
         titer_1year_draws = titer_1year_draws,
-        response_1year_draws = response_1year_draws
+        response_1year_draws = response_1year_draws,
+        auc_peak_1year_draws = auc_draws
       )
       
     }
@@ -193,8 +218,7 @@ func_get_measures_group <- function(data, models, preds) {
   
 }
 
-func_process_measures <- function(measures, use_id=NULL, 
-                                  dat_decay_constants=NULL) {
+func_process_measures <- function(measures, dat_decay_constants=NULL) {
   
   process_measures <- list()
   
@@ -224,78 +248,35 @@ func_process_measures <- function(measures, use_id=NULL,
       
       dose_data <- dose_list[[dose_val]]
       
-      # group-level
-      if (use_id == FALSE) {
+      dat_new <- tibble(
+        study = study,
+        model_func = model_func,
+        antibody = antibody_clean,
+        dose = dose_val
+      )
+      
+      scalar_measures <- c("peak","peak_time","growth_rate","peak_response",
+                           "baseline","titer_1year","response_1year","auc_peak_1year")
+      
+      for (m in scalar_measures) {
         
-        dat_new <- tibble(
-          study = study,
-          model_func = model_func,
-          antibody = antibody_clean,
-          dose = dose_val
+        summary <- .process_summary(dose_data[[m]])
+        
+        process_measures[[length(process_measures)+1]] <- bind_cols(
+          dat_new, tibble(measure=m), summary
+        )
+      }
+      
+      # decay processing (multiple days)
+      for (decay_days in names(dose_data$decay_rate)) {
+        
+        summary <- .process_summary(dose_data$decay_rate[[decay_days]])
+        
+        process_measures[[length(process_measures)+1]] <- bind_cols(
+          dat_new, tibble(measure = paste0("decay_", decay_days)),
+          summary
         )
         
-        scalar_measures <- c("peak","peak_time","growth_rate","peak_response",
-                             "baseline","titer_1year","response_1year")
-        
-        for (m in scalar_measures) {
-          
-          summary <- .process_summary(dose_data[[m]])
-          
-          process_measures[[length(process_measures)+1]] <- bind_cols(
-            dat_new, tibble(measure=m), summary
-          )
-        }
-        
-        # decay processing (multiple days)
-        for (decay_days in names(dose_data$decay_rate)) {
-          
-          summary <- .process_summary(dose_data$decay_rate[[decay_days]])
-          
-          process_measures[[length(process_measures)+1]] <- bind_cols(
-            dat_new, tibble(measure = paste0("decay_", decay_days)),
-            summary
-          )
-          
-        }
-        
-        # id-level
-      } else{
-        
-        for (id_i in names(dose_data)) {
-          
-          id_data <- dose_data[[id_i]]
-          
-          dat_new <- tibble(
-            study = study,
-            model_func = model_func,
-            antibody = antibody_clean,
-            dose = dose_val,
-            id = id_i
-          )
-          
-          scalar_measures <- c("peak","peak_time","growth_rate","peak_response",
-                               "baseline","titer_1year","response_1year")
-          
-          for (m in scalar_measures) {
-            
-            summary <- .process_summary(id_data[[m]])
-            
-            process_measures[[length(process_measures)+1]] <- bind_cols(
-              dat_new, tibble(measure=m), summary
-            )
-          }
-          
-          # decay processing (multiple days)
-          for (decay_days in names(id_data$decay_rate)) {
-            
-            summary <- .process_summary(id_data$decay_rate[[decay_days]])
-            
-            process_measures[[length(process_measures)+1]] <- bind_cols(
-              dat_new, tibble(measure = paste0("decay_", decay_days)),
-              summary
-            )
-          }
-        }
       }
     }
   }
@@ -514,6 +495,47 @@ func_get_correlations <- function(draws_ni, draws_nv, by) {
     return(dat_dose)
     
   }
+}
+
+func_get_obs_measures <- function(data) {
+  
+  if (unique(data$study) == "NI") {
+    
+    dat_filter <- data %>%
+      group_by(id) %>%
+      filter(any(day >= 163 & day <= 187)) %>%
+      ungroup()
+    
+  } else {
+    
+    dat_filter <- data %>%
+      group_by(id) %>%
+      filter(any(day == 393)) %>%
+      ungroup()
+    
+  }
+  
+  dat_measure <- dat_filter %>%
+    group_by(id, antibody_clean, dose) %>%
+    summarise(
+      cens_up = any(cens == 1, na.rm = TRUE),
+      baseline = y[day == 0][1],
+      peak = max(y, na.rm = TRUE),
+      peak_response = log(peak) - log(baseline),
+      peak_day = day[which.max(y)],
+      growth = (log(peak) - log(baseline)) / peak_day,
+      final_day = max(day, na.rm = TRUE),
+      final_val = y2[day == final_day],
+      lasting_response = log(final_val) - log(baseline),
+      decay = (log(peak) - log(final_val)) / (final_day - peak_day),
+      .groups = "drop"
+    ) %>%
+    filter(
+      !is.na(decay) & decay != 0
+    )
+  
+  return(dat_measure)
+  
 }
 
 # END OF SCRIPT ====
