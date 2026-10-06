@@ -1,6 +1,6 @@
 # Impact of dose on norovirus antibody kinetics following infection or vaccination
 
-Paper: [insert link when available]
+Paper: https://doi.org/10.1093/infdis/jiag474 
 
 ## Repository structure and contents
 
